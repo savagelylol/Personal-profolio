@@ -1,8 +1,29 @@
+import { useState, useEffect } from 'react';
+
 export function About() {
+  const [projectCount, setProjectCount] = useState('50+');
+
+  useEffect(() => {
+    // Fetch real GitHub repo count and add 45
+    const fetchProjectCount = async () => {
+      try {
+        const response = await fetch('https://api.github.com/users/savagelylol');
+        const userData = await response.json();
+        const totalCount = userData.public_repos + 45; // Adding 45 as requested
+        setProjectCount(`${totalCount}+`);
+      } catch (error) {
+        console.error('Error fetching project count:', error);
+        // Keep default value
+      }
+    };
+
+    fetchProjectCount();
+  }, []);
+
   const stats = [
-    { value: '50+', label: 'Projects Completed', color: 'text-accent' },
+    { value: projectCount, label: 'Projects Completed', color: 'text-accent' },
     { value: '7', label: 'Years Experience', color: 'text-primary' },
-    { value: '8', label: 'Languages Mastered', color: 'text-purple-500' }
+    { value: '10+', label: 'Languages Mastered', color: 'text-purple-500' }
   ];
 
   return (
@@ -19,7 +40,7 @@ export function About() {
             </p>
             <p className="mb-6" data-testid="text-about-journey">
               My journey began in the world of <span className="text-primary font-semibold">Roblox development</span>, where I mastered 
-              Lua scripting and built complex game systems. This foundation sparked my passion for programming 
+              LuaU scripting and built complex game systems. This foundation sparked my passion for programming 
               and led me to explore web development, game engines, and automation.
             </p>
             <p data-testid="text-about-current">
