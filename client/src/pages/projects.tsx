@@ -29,6 +29,7 @@ interface RobloxGame {
   updated: string;
   type: 'roblox';
   universeId: number;
+  rootPlaceId?: number;
 }
 
 type Project = GitHubRepo | RobloxGame;
@@ -45,62 +46,20 @@ export default function Projects() {
 
   const fetchAllProjects = async () => {
     try {
-      const [githubData, githubUserData] = await Promise.all([
+      const [githubData, githubUserData, robloxData] = await Promise.all([
         fetchGitHubRepos(),
-        fetchGitHubUserData()
+        fetchGitHubUserData(),
+        fetchRobloxGames()
       ]);
 
-      // Add sample Roblox games (since CORS prevents direct API access)
-      const robloxGames: RobloxGame[] = [
-        {
-          id: 1,
-          name: "Epic Adventure Simulator",
-          description: "A comprehensive adventure game with custom combat systems and progression mechanics",
-          placeVisits: 125000,
-          maxPlayers: 20,
-          playing: 45,
-          favoritedCount: 3200,
-          created: "2023-01-15T00:00:00Z",
-          updated: "2024-12-01T00:00:00Z",
-          type: 'roblox',
-          universeId: 1462440075
-        },
-        {
-          id: 2,
-          name: "Obby Challenge Pro",
-          description: "Professional obstacle course with advanced mechanics and leaderboards",
-          placeVisits: 89000,
-          maxPlayers: 12,
-          playing: 23,
-          favoritedCount: 1800,
-          created: "2023-06-20T00:00:00Z",
-          updated: "2024-11-15T00:00:00Z",
-          type: 'roblox',
-          universeId: 3670508462
-        },
-        {
-          id: 3,
-          name: "Racing Legends",
-          description: "High-speed racing experience with custom vehicles and tracks",
-          placeVisits: 67000,
-          maxPlayers: 16,
-          playing: 34,
-          favoritedCount: 2100,
-          created: "2023-03-10T00:00:00Z",
-          updated: "2024-10-30T00:00:00Z",
-          type: 'roblox',
-          universeId: 1462440075
-        }
-      ];
-
       // Combine and deduplicate projects
-      const allProjects = [...githubData, ...robloxGames];
+      const allProjects = [...githubData, ...robloxData];
       const deduplicatedProjects = deduplicateProjects(allProjects);
       
       setProjects(deduplicatedProjects);
       
       // Calculate total with +45 boost
-      const actualCount = githubUserData.public_repos + robloxGames.length;
+      const actualCount = githubUserData.public_repos + robloxData.length;
       setTotalProjectCount(actualCount + 45);
       
       setLoading(false);
@@ -122,6 +81,17 @@ export default function Projects() {
       ...repo,
       type: 'github' as const
     })).filter((repo: GitHubRepo) => !repo.name.includes('savagelylol'));
+  };
+
+  const fetchRobloxGames = async (): Promise<RobloxGame[]> => {
+    try {
+      const response = await fetch('/api/roblox-games');
+      const data = await response.json();
+      return data.games || [];
+    } catch (error) {
+      console.error('Error fetching Roblox games:', error);
+      return [];
+    }
   };
 
   // Deduplicate similar projects
@@ -191,7 +161,10 @@ export default function Projects() {
 
   const getProjectUrl = (project: Project): string => {
     if (project.type === 'roblox') {
-      return `https://www.roblox.com/users/${project.universeId}`;
+      const robloxGame = project as RobloxGame;
+      return robloxGame.rootPlaceId 
+        ? `https://www.roblox.com/games/${robloxGame.rootPlaceId}`
+        : `https://www.roblox.com/users/${robloxGame.universeId}`;
     }
     return (project as GitHubRepo).html_url;
   };

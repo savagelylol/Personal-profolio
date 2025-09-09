@@ -18,14 +18,6 @@ export function Projects() {
 
   const projects: Project[] = [
     {
-      id: 'roblox-rpg',
-      title: 'Epic Adventure RPG',
-      description: 'A complete RPG system in Roblox with custom combat, inventory, and progression systems.',
-      technologies: ['Lua', 'Roblox Studio'],
-      imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400',
-      type: 'game'
-    },
-    {
       id: 'analytics-dashboard',
       title: 'Analytics Dashboard',
       description: 'Real-time data visualization tool built with Python backend and JavaScript frontend.',
