@@ -22,8 +22,8 @@ export function Skills() {
       id: 'roblox',
       name: 'Roblox Development',
       icon: <Gamepad className="text-accent text-2xl" />,
-      percentage: 95,
-      description: 'Expert in Lua scripting and game mechanics'
+      percentage: 100,
+      description: 'Master of Lua scripting and complex game systems'
     },
     {
       id: 'python',
@@ -59,6 +59,34 @@ export function Skills() {
       icon: <Globe className="text-accent text-2xl" />,
       percentage: 90,
       description: 'Modern web standards and design'
+    },
+    {
+      id: 'csharp',
+      name: 'C#',
+      icon: <Code className="text-accent text-2xl" />,
+      percentage: 82,
+      description: '.NET development and desktop applications'
+    },
+    {
+      id: 'cpp',
+      name: 'C++',
+      icon: <FileCode className="text-accent text-2xl" />,
+      percentage: 75,
+      description: 'System programming and performance optimization'
+    },
+    {
+      id: 'c',
+      name: 'C',
+      icon: <FileCode className="text-accent text-2xl" />,
+      percentage: 70,
+      description: 'Low-level programming and embedded systems'
+    },
+    {
+      id: 'sql',
+      name: 'SQL',
+      icon: <Box className="text-accent text-2xl" />,
+      percentage: 85,
+      description: 'Database design and complex queries'
     }
   ];
 
@@ -116,10 +144,6 @@ export function Skills() {
     }
   };
 
-  const triggerAnimation = () => {
-    setAnimateMeters(false);
-    setTimeout(() => setAnimateMeters(true), 100);
-  };
 
   return (
     <section id="skills" className="py-20 relative" ref={skillsRef}>
@@ -184,14 +208,6 @@ export function Skills() {
           <p className="text-muted-foreground mb-4" data-testid="text-drag-hint">
             💡 Try dragging the skill cards around!
           </p>
-          <Button
-            onClick={triggerAnimation}
-            variant="secondary"
-            className="px-6 py-3 border border-border rounded-lg hover:bg-muted transition-all"
-            data-testid="button-animate-skills"
-          >
-            Animate Progress Bars
-          </Button>
         </div>
       </div>
     </section>

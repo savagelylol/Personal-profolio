@@ -1,6 +1,7 @@
 import { useTheme } from './ThemeProvider';
 import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
 
 export function Navigation() {
   const { theme, toggleTheme } = useTheme();
@@ -50,13 +51,14 @@ export function Navigation() {
             >
               Skills
             </button>
-            <button 
-              onClick={() => scrollToSection('projects')}
-              className="hover:text-primary transition-colors"
-              data-testid="link-projects"
-            >
-              Projects
-            </button>
+            <Link href="/projects">
+              <button 
+                className="hover:text-primary transition-colors"
+                data-testid="link-projects"
+              >
+                Projects
+              </button>
+            </Link>
             <button 
               onClick={() => scrollToSection('about')}
               className="hover:text-primary transition-colors"

@@ -1,12 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
 
 export function Hero() {
-  const scrollToProjects = () => {
-    const element = document.getElementById('projects');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
 
   const technologies = ['Lua', 'Python', 'JavaScript', 'GoDot', 'Ruby'];
 
@@ -30,13 +25,14 @@ export function Hero() {
             </span>
           ))}
         </div>
-        <Button
-          onClick={scrollToProjects}
-          className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:scale-105 transition-all"
-          data-testid="button-explore-work"
-        >
-          Explore My Work
-        </Button>
+        <Link href="/projects">
+          <Button
+            className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:scale-105 transition-all"
+            data-testid="button-explore-work"
+          >
+            Explore My Work
+          </Button>
+        </Link>
       </div>
     </section>
   );
