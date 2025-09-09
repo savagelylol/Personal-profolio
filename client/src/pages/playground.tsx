@@ -25,6 +25,245 @@ interface CodeSnippet {
   description: string;
 }
 
+// 3D Game Component
+function Game3D() {
+  const gameCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [gameState, setGameState] = useState({
+    cubeColor: '#667eea',
+    rotationSpeed: 0.02,
+    cubeSize: 80,
+    zoom: 200,
+    autoRotate: true
+  });
+  const [gameAnimationId, setGameAnimationId] = useState<number>();
+
+  useEffect(() => {
+    const canvas = gameCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = 400;
+    canvas.height = 300;
+
+    let angleX = 0;
+    let angleY = 0;
+    let mouseDown = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    // 3D cube vertices
+    const vertices = [
+      [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],  // back face
+      [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]      // front face
+    ];
+
+    // Cube faces (indices into vertices array)
+    const faces = [
+      [0, 1, 2, 3], [4, 7, 6, 5], [0, 4, 5, 1], 
+      [2, 6, 7, 3], [0, 3, 7, 4], [1, 5, 6, 2]
+    ];
+
+    // 3D to 2D projection
+    function project(point: number[]) {
+      const [x, y, z] = point;
+      const scale = gameState.zoom / (gameState.zoom + z);
+      return [
+        canvas.width / 2 + x * scale,
+        canvas.height / 2 + y * scale,
+        z
+      ];
+    }
+
+    // Matrix multiplication for rotation
+    function rotateX(point: number[], angle: number) {
+      const [x, y, z] = point;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [x, y * cos - z * sin, y * sin + z * cos];
+    }
+
+    function rotateY(point: number[], angle: number) {
+      const [x, y, z] = point;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [x * cos + z * sin, y, -x * sin + z * cos];
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Background
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (gameState.autoRotate) {
+        angleY += gameState.rotationSpeed;
+        angleX += gameState.rotationSpeed * 0.5;
+      }
+
+      // Transform vertices
+      const transformedVertices = vertices.map(vertex => {
+        let point = vertex.map(coord => coord * gameState.cubeSize);
+        point = rotateX(point, angleX);
+        point = rotateY(point, angleY);
+        return project(point);
+      });
+
+      // Sort faces by depth (painter's algorithm)
+      const facesWithDepth = faces.map((face, index) => {
+        const avgZ = face.reduce((sum, vertexIndex) => 
+          sum + transformedVertices[vertexIndex][2], 0) / face.length;
+        return { face, depth: avgZ, index };
+      }).sort((a, b) => a.depth - b.depth);
+
+      // Draw faces
+      facesWithDepth.forEach(({ face, index }) => {
+        ctx.beginPath();
+        face.forEach((vertexIndex, i) => {
+          const [x, y] = transformedVertices[vertexIndex];
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+
+        // Different colors for each face
+        const colors = [
+          gameState.cubeColor,
+          '#764ba2',
+          '#f093fb',
+          '#f5576c',
+          '#4facfe',
+          '#43e97b'
+        ];
+        
+        ctx.fillStyle = colors[index] + '80';
+        ctx.fill();
+        ctx.strokeStyle = gameState.cubeColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+
+      // Draw center point
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+
+      const id = requestAnimationFrame(animate);
+      setGameAnimationId(id);
+    }
+
+    // Mouse controls
+    const handleMouseDown = (e: MouseEvent) => {
+      mouseDown = true;
+      lastMouseX = e.offsetX;
+      lastMouseY = e.offsetY;
+      setGameState(prev => ({ ...prev, autoRotate: false }));
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!mouseDown) return;
+      const deltaX = e.offsetX - lastMouseX;
+      const deltaY = e.offsetY - lastMouseY;
+      angleY += deltaX * 0.01;
+      angleX += deltaY * 0.01;
+      lastMouseX = e.offsetX;
+      lastMouseY = e.offsetY;
+    };
+
+    const handleMouseUp = () => {
+      mouseDown = false;
+    };
+
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleMouseUp);
+
+    animate();
+
+    return () => {
+      if (gameAnimationId) cancelAnimationFrame(gameAnimationId);
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [gameState]);
+
+  return (
+    <div className="space-y-4">
+      <canvas
+        ref={gameCanvasRef}
+        className="border-2 border-primary rounded-lg cursor-grab active:cursor-grabbing bg-gray-900"
+        style={{ width: '100%', maxWidth: '400px', height: '300px' }}
+      />
+      
+      <div className="space-y-3">
+        <div>
+          <label className="text-sm font-medium">Cube Color:</label>
+          <input
+            type="color"
+            value={gameState.cubeColor}
+            onChange={(e) => setGameState(prev => ({ ...prev, cubeColor: e.target.value }))}
+            className="ml-2 w-8 h-8 rounded cursor-pointer"
+          />
+        </div>
+        
+        <div>
+          <label className="text-sm font-medium">Size: {gameState.cubeSize}</label>
+          <input
+            type="range"
+            min="40"
+            max="120"
+            value={gameState.cubeSize}
+            onChange={(e) => setGameState(prev => ({ ...prev, cubeSize: parseInt(e.target.value) }))}
+            className="w-full"
+          />
+        </div>
+        
+        <div>
+          <label className="text-sm font-medium">Speed: {gameState.rotationSpeed.toFixed(3)}</label>
+          <input
+            type="range"
+            min="0"
+            max="0.1"
+            step="0.005"
+            value={gameState.rotationSpeed}
+            onChange={(e) => setGameState(prev => ({ ...prev, rotationSpeed: parseFloat(e.target.value) }))}
+            className="w-full"
+          />
+        </div>
+
+        <div className="flex space-x-2">
+          <Button
+            size="sm"
+            onClick={() => setGameState(prev => ({ ...prev, autoRotate: !prev.autoRotate }))}
+            variant={gameState.autoRotate ? "default" : "outline"}
+          >
+            {gameState.autoRotate ? 'Pause' : 'Auto Rotate'}
+          </Button>
+          
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setGameState(prev => ({ 
+              ...prev, 
+              cubeColor: `hsl(${Math.random() * 360}, 70%, 60%)` 
+            }))}
+          >
+            Random Color
+          </Button>
+        </div>
+        
+        <p className="text-xs text-muted-foreground">
+          🎮 Drag to rotate manually • Adjust properties above
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function Playground() {
   const [activeTab, setActiveTab] = useState('code');
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
@@ -296,18 +535,70 @@ console.log('✨ Click the canvas to create particles!');`,
     setOutput('');
 
     try {
-      // Simulate code execution
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       if (selectedLanguage === 'javascript') {
-        setOutput('✅ Code executed successfully!\n🎉 Check the browser console for output');
-        // In a real implementation, you would safely execute the JavaScript
-        console.log('Executing user code:', code);
+        // Capture console output
+        const logs: string[] = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        // Override console methods to capture output
+        console.log = (...args) => {
+          logs.push('LOG: ' + args.join(' '));
+          originalLog.apply(console, args);
+        };
+        console.error = (...args) => {
+          logs.push('ERROR: ' + args.join(' '));
+          originalError.apply(console, args);
+        };
+        console.warn = (...args) => {
+          logs.push('WARN: ' + args.join(' '));
+          originalWarn.apply(console, args);
+        };
+
+        try {
+          // Create a safe execution context
+          const func = new Function(`
+            try {
+              ${code}
+              return 'Code executed successfully';
+            } catch (e) {
+              console.error(e.message);
+              throw e;
+            }
+          `);
+          
+          const result = func();
+          
+          // Restore original console methods
+          console.log = originalLog;
+          console.error = originalError;
+          console.warn = originalWarn;
+
+          if (logs.length > 0) {
+            setOutput('✅ Code executed successfully!\n\n📝 Output:\n' + logs.join('\n'));
+          } else {
+            setOutput('✅ Code executed successfully!\n\n📝 No console output generated.');
+          }
+        } catch (error) {
+          // Restore original console methods
+          console.log = originalLog;
+          console.error = originalError;
+          console.warn = originalWarn;
+
+          if (logs.length > 0) {
+            setOutput('❌ Error in code execution:\n\n' + logs.join('\n') + '\n\n💡 ' + (error as Error).message);
+          } else {
+            setOutput('❌ Error in code execution:\n\n💡 ' + (error as Error).message);
+          }
+        }
       } else {
-        setOutput(`✅ ${languages.find(l => l.id === selectedLanguage)?.name} code validated!\n📝 Code looks good and ready to run`);
+        setOutput(`✅ ${languages.find(l => l.id === selectedLanguage)?.name} code validated!\n📝 Code syntax looks good!`);
       }
     } catch (error) {
-      setOutput('❌ Error executing code:\n' + (error as Error).message);
+      setOutput('❌ Unexpected error:\n' + (error as Error).message);
     } finally {
       setIsRunning(false);
     }
@@ -568,21 +859,13 @@ console.log('✨ Click the canvas to create particles!');`,
           </TabsContent>
 
           <TabsContent value="tools" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Color Tools</CardTitle>
+                  <CardTitle>🎮 3D Game Playground</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button className="w-full" variant="outline">
-                    🎨 Color Picker
-                  </Button>
-                  <Button className="w-full" variant="outline">
-                    🌈 Gradient Generator
-                  </Button>
-                  <Button className="w-full" variant="outline">
-                    🎯 Palette Generator
-                  </Button>
+                <CardContent>
+                  <Game3D />
                 </CardContent>
               </Card>
 
@@ -592,13 +875,16 @@ console.log('✨ Click the canvas to create particles!');`,
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Button className="w-full" variant="outline">
+                    🎨 Color Picker
+                  </Button>
+                  <Button className="w-full" variant="outline">
+                    🌈 Gradient Generator
+                  </Button>
+                  <Button className="w-full" variant="outline">
                     📐 CSS Grid Generator
                   </Button>
                   <Button className="w-full" variant="outline">
                     🔤 Lorem Ipsum Generator
-                  </Button>
-                  <Button className="w-full" variant="outline">
-                    📱 Responsive Tester
                   </Button>
                 </CardContent>
               </Card>
