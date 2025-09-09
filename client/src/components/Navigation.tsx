@@ -59,6 +59,14 @@ export function Navigation() {
                 Projects
               </button>
             </Link>
+            <Link href="/playground">
+              <button 
+                className="hover:text-primary transition-colors"
+                data-testid="link-playground"
+              >
+                Playground
+              </button>
+            </Link>
             <button 
               onClick={() => scrollToSection('about')}
               className="hover:text-primary transition-colors"
