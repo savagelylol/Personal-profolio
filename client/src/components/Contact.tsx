@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Github, Twitter, Mail, MessageSquare, Send } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -12,15 +13,62 @@ export function Contact() {
   });
 
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all fields before sending.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        toast({
+          title: "Message Sent! 🎉",
+          description: "Thanks for reaching out! I'll get back to you soon.",
+        });
+        
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          message: ''
+        });
+      } else {
+        throw new Error(data.error || 'Failed to send message');
+      }
+    } catch (error) {
+      toast({
+        title: "Oops! Something went wrong",
+        description: "Failed to send message. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const socialLinks = [
@@ -98,11 +146,12 @@ export function Contact() {
 
             <Button
               type="submit"
-              className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:scale-105 transition-all"
+              disabled={isSubmitting}
+              className="w-full py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-send-message"
             >
-              <Send className="w-4 h-4 mr-2" />
-              Send Message
+              <Send className={`w-4 h-4 mr-2 ${isSubmitting ? 'animate-pulse' : ''}`} />
+              {isSubmitting ? 'Sending...' : 'Send Message'}
             </Button>
           </form>
           

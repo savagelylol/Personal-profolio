@@ -14,7 +14,7 @@ export function Hero() {
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const technologies = ['Lua', 'Python', 'JavaScript', 'GoDot', 'Ruby'];
+  const technologies = ['Lua', 'Python', 'JavaScript', 'GoDot', 'Ruby', 'C++', 'SQL'];
 
   const techInfo: Record<string, { description: string; usedFor: string[]; experience: string }> = {
     Lua: {
@@ -41,6 +41,16 @@ export function Hero() {
       description: "A dynamic, open-source programming language focused on simplicity and productivity.",
       usedFor: ["Web development with Rails", "Scripting", "Automation", "Rapid prototyping"],
       experience: "3+ years building web applications and automation tools"
+    },
+    "C++": {
+      description: "A powerful, general-purpose programming language that supports procedural and object-oriented programming.",
+      usedFor: ["Game engines", "System programming", "Performance-critical applications", "Desktop software"],
+      experience: "3+ years developing high-performance applications and game systems"
+    },
+    SQL: {
+      description: "A domain-specific language for managing and querying data stored in relational databases.",
+      usedFor: ["Database queries", "Data analysis", "Report generation", "Backend data management"],
+      experience: "4+ years designing databases and writing complex queries"
     }
   };
 
