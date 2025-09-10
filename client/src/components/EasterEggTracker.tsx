@@ -14,7 +14,9 @@ export function EasterEggTracker({ isVisible = false, onHide }: EasterEggTracker
   const [foundEggs, setFoundEggs] = useState<string[]>([]);
   const [showReward, setShowReward] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
-  const [manuallyHidden, setManuallyHidden] = useState(false);
+  const [manuallyHidden, setManuallyHidden] = useState(() => {
+    return localStorage.getItem('easterEggTrackerHidden') === 'true';
+  });
 
   const totalEggs = 7;
   const easterEggList = [
@@ -83,6 +85,7 @@ export function EasterEggTracker({ isVisible = false, onHide }: EasterEggTracker
               size="sm"
               onClick={() => {
                 setManuallyHidden(true);
+                localStorage.setItem('easterEggTrackerHidden', 'true');
                 if (onHide) onHide();
               }}
               className="h-6 w-6 p-0 hover:bg-secondary"

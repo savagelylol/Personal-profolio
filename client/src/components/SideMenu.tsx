@@ -88,7 +88,9 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
           window.dispatchEvent(new CustomEvent('easterEggFound'));
           alert('🎉 Easter Egg #1 Found! You clicked the Easter Eggs menu item!');
         }
-        // Navigate to easter eggs page after the discovery
+        // Show tracker and navigate to easter eggs page
+        localStorage.removeItem('easterEggTrackerHidden');
+        window.dispatchEvent(new CustomEvent('showEasterEggTracker'));
         setTimeout(() => {
           window.location.href = '/easter-eggs';
         }, 100);

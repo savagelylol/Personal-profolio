@@ -12,8 +12,16 @@ export default function Home() {
   const [showEasterEggTracker, setShowEasterEggTracker] = useState(false);
 
   useEffect(() => {
-    const handleShowTracker = () => setShowEasterEggTracker(true);
-    const handleEasterEggFound = () => setShowEasterEggTracker(true);
+    const handleShowTracker = () => {
+      localStorage.removeItem('easterEggTrackerHidden');
+      setShowEasterEggTracker(true);
+    };
+    const handleEasterEggFound = () => {
+      // Only show tracker if it wasn't manually hidden
+      if (localStorage.getItem('easterEggTrackerHidden') !== 'true') {
+        setShowEasterEggTracker(true);
+      }
+    };
     
     window.addEventListener('showEasterEggTracker', handleShowTracker);
     window.addEventListener('easterEggFound', handleEasterEggFound);
