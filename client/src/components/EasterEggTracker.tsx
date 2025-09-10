@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Gift, Trophy, Star } from 'lucide-react';
+import { EasterEggReward } from './EasterEggReward';
 
 export function EasterEggTracker() {
   const [foundEggs, setFoundEggs] = useState<string[]>([]);
   const [showReward, setShowReward] = useState(false);
+  const [showRewardModal, setShowRewardModal] = useState(false);
 
   const totalEggs = 7;
   const easterEggList = [
@@ -31,17 +33,13 @@ export function EasterEggTracker() {
   }, []);
 
   const claimReward = () => {
+    setShowRewardModal(true);
+  };
+
+  const handleRewardComplete = () => {
     localStorage.setItem('rewardClaimed', 'true');
     setShowReward(false);
-    alert(`🎉🏆 CONGRATULATIONS! 🏆🎉
-    
-You found all ${totalEggs} easter eggs! You're a true explorer! 
-
-🎁 Your reward: The secret knowledge that you're awesome and turflix and expois would be proud!
-
-Plus, you've proven you have the curiosity and attention to detail that makes a great developer! 
-
-Keep that spirit alive! 🚀✨`);
+    setShowRewardModal(false);
   };
 
   // Don't render anything if no eggs found
@@ -104,6 +102,11 @@ Keep that spirit alive! 🚀✨`);
           )}
         </CardContent>
       </Card>
+      
+      {/* Reward Modal */}
+      {showRewardModal && (
+        <EasterEggReward onClose={handleRewardComplete} />
+      )}
     </div>
   );
 }

@@ -36,8 +36,20 @@ export function Navigation() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="font-mono text-xl font-bold glow-text" data-testid="text-logo">
-            savage.dev
+          <div className="flex items-center gap-4">
+            {/* Hamburger Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSideMenuOpen(true)}
+              className="hover:bg-secondary hover:scale-110 transition-all"
+              data-testid="button-menu"
+            >
+              <Menu className="w-6 h-6" />
+            </Button>
+            <div className="font-mono text-xl font-bold glow-text" data-testid="text-logo">
+              savage.dev
+            </div>
           </div>
           <div className="flex items-center gap-6">
             {/* Main Navigation - Desktop */}
@@ -74,16 +86,6 @@ export function Navigation() {
               </button>
             </div>
 
-            {/* Hamburger Menu Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsSideMenuOpen(true)}
-              className="hover:bg-secondary hover:scale-110 transition-all"
-              data-testid="button-menu"
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </nav>
