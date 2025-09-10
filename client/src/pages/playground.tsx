@@ -25,17 +25,27 @@ interface CodeSnippet {
   description: string;
 }
 
-// 3D Game Component
+// Car Physics Game Component
 function Game3D() {
   const gameCanvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState({
-    cubeColor: '#667eea',
-    rotationSpeed: 0.02,
-    cubeSize: 80,
-    zoom: 200,
-    autoRotate: true
+    carColor: '#ff4444',
+    speed: 5,
+    friction: 0.95,
+    gravity: 0.5,
+    bounceHeight: 15
   });
+  const [carState, setCarState] = useState({
+    x: 200,
+    y: 200,
+    velocityX: 0,
+    velocityY: 0,
+    rotation: 0,
+    onGround: false
+  });
+  const [keys, setKeys] = useState<{[key: string]: boolean}>({});
   const [gameAnimationId, setGameAnimationId] = useState<number>();
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const canvas = gameCanvasRef.current;
@@ -44,193 +54,237 @@ function Game3D() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 400;
-    canvas.height = 300;
+    canvas.width = 500;
+    canvas.height = 350;
 
-    let angleX = 0;
-    let angleY = 0;
-    let mouseDown = false;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-
-    // 3D cube vertices
-    const vertices = [
-      [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],  // back face
-      [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]      // front face
+    // Track creation for racing
+    const obstacles = [
+      { x: 100, y: 250, width: 80, height: 20 },
+      { x: 300, y: 180, width: 60, height: 15 },
+      { x: 420, y: 280, width: 70, height: 25 },
     ];
 
-    // Cube faces (indices into vertices array)
-    const faces = [
-      [0, 1, 2, 3], [4, 7, 6, 5], [0, 4, 5, 1], 
-      [2, 6, 7, 3], [0, 3, 7, 4], [1, 5, 6, 2]
-    ];
+    const finish = { x: 450, y: 50, width: 50, height: 40 };
 
-    // 3D to 2D projection
-    function project(point: number[]) {
-      const [x, y, z] = point;
-      const scale = gameState.zoom / (gameState.zoom + z);
-      return [
-        canvas.width / 2 + x * scale,
-        canvas.height / 2 + y * scale,
-        z
-      ];
+    function drawCar(x: number, y: number, rotation: number) {
+      ctx!.save();
+      ctx!.translate(x, y);
+      ctx!.rotate(rotation);
+      
+      // Car body
+      ctx!.fillStyle = gameState.carColor;
+      ctx!.fillRect(-15, -8, 30, 16);
+      
+      // Car details
+      ctx!.fillStyle = '#333';
+      ctx!.fillRect(-12, -6, 24, 3); // windshield
+      ctx!.fillRect(-12, 3, 24, 3);  // back window
+      
+      // Wheels
+      ctx!.fillStyle = '#222';
+      ctx!.beginPath();
+      ctx!.arc(-8, -10, 3, 0, Math.PI * 2);
+      ctx!.arc(8, -10, 3, 0, Math.PI * 2);
+      ctx!.arc(-8, 10, 3, 0, Math.PI * 2);
+      ctx!.arc(8, 10, 3, 0, Math.PI * 2);
+      ctx!.fill();
+      
+      ctx!.restore();
     }
 
-    // Matrix multiplication for rotation
-    function rotateX(point: number[], angle: number) {
-      const [x, y, z] = point;
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-      return [x, y * cos - z * sin, y * sin + z * cos];
+    function drawTrack() {
+      // Background
+      ctx!.fillStyle = '#2a4a3a';
+      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+      
+      // Track borders
+      ctx!.fillStyle = '#8B4513';
+      ctx!.fillRect(0, 0, canvas!.width, 10);
+      ctx!.fillRect(0, canvas!.height - 10, canvas!.width, 10);
+      ctx!.fillRect(0, 0, 10, canvas!.height);
+      ctx!.fillRect(canvas!.width - 10, 0, 10, canvas!.height);
+      
+      // Obstacles
+      ctx!.fillStyle = '#654321';
+      obstacles.forEach(obs => {
+        ctx!.fillRect(obs.x, obs.y, obs.width, obs.height);
+      });
+      
+      // Finish line
+      ctx!.fillStyle = '#FFD700';
+      ctx!.strokeStyle = '#FF0000';
+      ctx!.lineWidth = 3;
+      ctx!.fillRect(finish.x, finish.y, finish.width, finish.height);
+      ctx!.strokeRect(finish.x, finish.y, finish.width, finish.height);
+      
+      // Checkered pattern
+      for (let i = 0; i < finish.width; i += 10) {
+        for (let j = 0; j < finish.height; j += 10) {
+          if ((i + j) % 20 === 0) {
+            ctx!.fillStyle = '#000';
+            ctx!.fillRect(finish.x + i, finish.y + j, 10, 10);
+          }
+        }
+      }
     }
 
-    function rotateY(point: number[], angle: number) {
-      const [x, y, z] = point;
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-      return [x * cos + z * sin, y, -x * sin + z * cos];
+    function checkCollisions(newX: number, newY: number) {
+      // Wall collisions
+      if (newX < 15 || newX > canvas!.width - 15 || newY < 15 || newY > canvas!.height - 15) {
+        return true;
+      }
+      
+      // Obstacle collisions
+      for (const obs of obstacles) {
+        if (newX > obs.x - 15 && newX < obs.x + obs.width + 15 &&
+            newY > obs.y - 15 && newY < obs.y + obs.height + 15) {
+          return true;
+        }
+      }
+      
+      return false;
+    }
+
+    function checkFinish(x: number, y: number) {
+      return x > finish.x && x < finish.x + finish.width &&
+             y > finish.y && y < finish.y + finish.height;
     }
 
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      drawTrack();
 
-      // Background
-      ctx.fillStyle = '#1a1a2e';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      if (gameState.autoRotate) {
-        angleY += gameState.rotationSpeed;
-        angleX += gameState.rotationSpeed * 0.5;
-      }
-
-      // Transform vertices
-      const transformedVertices = vertices.map(vertex => {
-        let point = vertex.map(coord => coord * gameState.cubeSize);
-        point = rotateX(point, angleX);
-        point = rotateY(point, angleY);
-        return project(point);
-      });
-
-      // Sort faces by depth (painter's algorithm)
-      const facesWithDepth = faces.map((face, index) => {
-        const avgZ = face.reduce((sum, vertexIndex) => 
-          sum + transformedVertices[vertexIndex][2], 0) / face.length;
-        return { face, depth: avgZ, index };
-      }).sort((a, b) => a.depth - b.depth);
-
-      // Draw faces
-      facesWithDepth.forEach(({ face, index }) => {
-        ctx.beginPath();
-        face.forEach((vertexIndex, i) => {
-          const [x, y] = transformedVertices[vertexIndex];
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.closePath();
-
-        // Different colors for each face
-        const colors = [
-          gameState.cubeColor,
-          '#764ba2',
-          '#f093fb',
-          '#f5576c',
-          '#4facfe',
-          '#43e97b'
-        ];
+      setCarState(prev => {
+        let { x, y, velocityX, velocityY, rotation } = prev;
         
-        ctx.fillStyle = colors[index] + '80';
-        ctx.fill();
-        ctx.strokeStyle = gameState.cubeColor;
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        // Handle input
+        if (keys['ArrowUp'] || keys['w']) {
+          velocityX += Math.cos(rotation) * gameState.speed * 0.1;
+          velocityY += Math.sin(rotation) * gameState.speed * 0.1;
+        }
+        if (keys['ArrowDown'] || keys['s']) {
+          velocityX -= Math.cos(rotation) * gameState.speed * 0.05;
+          velocityY -= Math.sin(rotation) * gameState.speed * 0.05;
+        }
+        if (keys['ArrowLeft'] || keys['a']) {
+          rotation -= 0.1;
+        }
+        if (keys['ArrowRight'] || keys['d']) {
+          rotation += 0.1;
+        }
+        if (keys[' ']) { // Spacebar for boost
+          velocityX += Math.cos(rotation) * gameState.speed * 0.2;
+          velocityY += Math.sin(rotation) * gameState.speed * 0.2;
+        }
+
+        // Apply friction
+        velocityX *= gameState.friction;
+        velocityY *= gameState.friction;
+
+        // Calculate new position
+        const newX = x + velocityX;
+        const newY = y + velocityY;
+
+        // Check collisions
+        if (checkCollisions(newX, newY)) {
+          // Bounce off walls/obstacles
+          velocityX *= -0.5;
+          velocityY *= -0.5;
+        } else {
+          x = newX;
+          y = newY;
+        }
+
+        // Check finish line
+        if (checkFinish(x, y)) {
+          setScore(prev => prev + 10);
+          // Reset car position
+          x = 50;
+          y = 300;
+          velocityX = 0;
+          velocityY = 0;
+        }
+
+        return { x, y, velocityX, velocityY, rotation, onGround: true };
       });
 
-      // Draw center point
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, canvas.height / 2, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff';
-      ctx.fill();
+      // Draw car
+      drawCar(carState.x, carState.y, carState.rotation);
+      
+      // Draw UI
+      ctx!.fillStyle = '#fff';
+      ctx!.font = '16px monospace';
+      ctx!.fillText(`Score: ${score}`, 20, 30);
+      ctx!.fillText(`Speed: ${Math.sqrt(carState.velocityX**2 + carState.velocityY**2).toFixed(1)}`, 20, 50);
 
       const id = requestAnimationFrame(animate);
       setGameAnimationId(id);
     }
 
-    // Mouse controls
-    const handleMouseDown = (e: MouseEvent) => {
-      mouseDown = true;
-      lastMouseX = e.offsetX;
-      lastMouseY = e.offsetY;
-      setGameState(prev => ({ ...prev, autoRotate: false }));
+    // Keyboard event handlers
+    const handleKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+      setKeys(prev => ({ ...prev, [e.key]: true }));
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!mouseDown) return;
-      const deltaX = e.offsetX - lastMouseX;
-      const deltaY = e.offsetY - lastMouseY;
-      angleY += deltaX * 0.01;
-      angleX += deltaY * 0.01;
-      lastMouseX = e.offsetX;
-      lastMouseY = e.offsetY;
+    const handleKeyUp = (e: KeyboardEvent) => {
+      e.preventDefault();
+      setKeys(prev => ({ ...prev, [e.key]: false }));
     };
 
-    const handleMouseUp = () => {
-      mouseDown = false;
-    };
-
-    canvas.addEventListener('mousedown', handleMouseDown);
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     animate();
 
     return () => {
       if (gameAnimationId) cancelAnimationFrame(gameAnimationId);
-      canvas.removeEventListener('mousedown', handleMouseDown);
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [gameState]);
+  }, [gameState, carState, keys, score]);
 
   return (
     <div className="space-y-4">
       <canvas
         ref={gameCanvasRef}
-        className="border-2 border-primary rounded-lg cursor-grab active:cursor-grabbing bg-gray-900"
-        style={{ width: '100%', maxWidth: '400px', height: '300px' }}
+        className="border-2 border-primary rounded-lg bg-gray-900 focus:outline-none"
+        style={{ width: '100%', maxWidth: '500px', height: '350px' }}
+        tabIndex={0}
       />
       
       <div className="space-y-3">
         <div>
-          <label className="text-sm font-medium">Cube Color:</label>
+          <label className="text-sm font-medium">Car Color:</label>
           <input
             type="color"
-            value={gameState.cubeColor}
-            onChange={(e) => setGameState(prev => ({ ...prev, cubeColor: e.target.value }))}
+            value={gameState.carColor}
+            onChange={(e) => setGameState(prev => ({ ...prev, carColor: e.target.value }))}
             className="ml-2 w-8 h-8 rounded cursor-pointer"
           />
         </div>
         
         <div>
-          <label className="text-sm font-medium">Size: {gameState.cubeSize}</label>
+          <label className="text-sm font-medium">Speed: {gameState.speed}</label>
           <input
             type="range"
-            min="40"
-            max="120"
-            value={gameState.cubeSize}
-            onChange={(e) => setGameState(prev => ({ ...prev, cubeSize: parseInt(e.target.value) }))}
+            min="2"
+            max="10"
+            value={gameState.speed}
+            onChange={(e) => setGameState(prev => ({ ...prev, speed: parseInt(e.target.value) }))}
             className="w-full"
           />
         </div>
         
         <div>
-          <label className="text-sm font-medium">Speed: {gameState.rotationSpeed.toFixed(3)}</label>
+          <label className="text-sm font-medium">Friction: {gameState.friction.toFixed(2)}</label>
           <input
             type="range"
-            min="0"
-            max="0.1"
-            step="0.005"
-            value={gameState.rotationSpeed}
-            onChange={(e) => setGameState(prev => ({ ...prev, rotationSpeed: parseFloat(e.target.value) }))}
+            min="0.8"
+            max="0.99"
+            step="0.01"
+            value={gameState.friction}
+            onChange={(e) => setGameState(prev => ({ ...prev, friction: parseFloat(e.target.value) }))}
             className="w-full"
           />
         </div>
@@ -238,10 +292,12 @@ function Game3D() {
         <div className="flex space-x-2">
           <Button
             size="sm"
-            onClick={() => setGameState(prev => ({ ...prev, autoRotate: !prev.autoRotate }))}
-            variant={gameState.autoRotate ? "default" : "outline"}
+            onClick={() => {
+              setCarState({ x: 50, y: 300, velocityX: 0, velocityY: 0, rotation: 0, onGround: true });
+              setScore(0);
+            }}
           >
-            {gameState.autoRotate ? 'Pause' : 'Auto Rotate'}
+            Reset Car
           </Button>
           
           <Button
@@ -249,16 +305,18 @@ function Game3D() {
             variant="outline"
             onClick={() => setGameState(prev => ({ 
               ...prev, 
-              cubeColor: `hsl(${Math.random() * 360}, 70%, 60%)` 
+              carColor: `hsl(${Math.random() * 360}, 70%, 60%)` 
             }))}
           >
             Random Color
           </Button>
         </div>
         
-        <p className="text-xs text-muted-foreground">
-          🎮 Drag to rotate manually • Adjust properties above
-        </p>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p>🚗 Controls: WASD or Arrow Keys</p>
+          <p>🚀 Spacebar: Boost • 🏁 Reach the gold finish line!</p>
+          <p>⚠️ Avoid brown obstacles and walls</p>
+        </div>
       </div>
     </div>
   );
@@ -577,22 +635,48 @@ console.log('✨ Click the canvas to create particles!');`,
           console.error = originalError;
           console.warn = originalWarn;
 
+          const timestamp = new Date().toLocaleTimeString();
+          let outputText = `🚀 Execution completed at ${timestamp}\n${'='.repeat(40)}\n\n`;
+          
           if (logs.length > 0) {
-            setOutput('✅ Code executed successfully!\n\n📝 Output:\n' + logs.join('\n'));
+            outputText += '📊 Console Output:\n' + '─'.repeat(20) + '\n';
+            logs.forEach((log, index) => {
+              const type = log.startsWith('ERROR:') ? '❌' : log.startsWith('WARN:') ? '⚠️' : '📝';
+              outputText += `${index + 1}. ${type} ${log}\n`;
+            });
+            outputText += '\n✅ Code executed successfully!';
           } else {
-            setOutput('✅ Code executed successfully!\n\n📝 No console output generated.');
+            outputText += '📝 No console output generated.\n✅ Code executed without errors!';
           }
+          
+          outputText += `\n\n⏱️ Execution time: ${Date.now() - performance.now()}ms`;
+          setOutput(outputText);
         } catch (error) {
           // Restore original console methods
           console.log = originalLog;
           console.error = originalError;
           console.warn = originalWarn;
 
+          const timestamp = new Date().toLocaleTimeString();
+          let errorOutput = `💥 Execution failed at ${timestamp}\n${'='.repeat(40)}\n\n`;
+          
           if (logs.length > 0) {
-            setOutput('❌ Error in code execution:\n\n' + logs.join('\n') + '\n\n💡 ' + (error as Error).message);
-          } else {
-            setOutput('❌ Error in code execution:\n\n💡 ' + (error as Error).message);
+            errorOutput += '📊 Console Output:\n' + '─'.repeat(20) + '\n';
+            logs.forEach((log, index) => {
+              const type = log.startsWith('ERROR:') ? '❌' : log.startsWith('WARN:') ? '⚠️' : '📝';
+              errorOutput += `${index + 1}. ${type} ${log}\n`;
+            });
+            errorOutput += '\n';
           }
+          
+          errorOutput += `🔍 Error Details:\n${'─'.repeat(15)}\n💡 ${(error as Error).message}\n\n`;
+          errorOutput += '🛠️ Debugging Tips:\n';
+          errorOutput += '• Check for syntax errors\n';
+          errorOutput += '• Verify variable names\n';
+          errorOutput += '• Check function calls\n';
+          errorOutput += '• Look for missing semicolons';
+          
+          setOutput(errorOutput);
         }
       } else {
         setOutput(`✅ ${languages.find(l => l.id === selectedLanguage)?.name} code validated!\n📝 Code syntax looks good!`);
@@ -608,6 +692,7 @@ console.log('✨ Click the canvas to create particles!');`,
     setCode(snippet.code);
     setSelectedLanguage(snippet.language);
     setOutput('');
+    setActiveTab('code'); // Automatically switch to code editor tab
   };
 
   const clearCode = () => {
@@ -678,6 +763,9 @@ console.log('✨ Click the canvas to create particles!');`,
               <Badge variant="secondary" className="animate-pulse">
                 <Sparkles className="w-3 h-3 mr-1" />
                 Live
+              </Badge>
+              <Badge className="bg-blue-500 text-white">
+                Beta
               </Badge>
             </div>
           </div>

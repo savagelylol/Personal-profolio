@@ -18,7 +18,7 @@ export function Navigation() {
       {/* Theme Toggle */}
       <Button
         onClick={toggleTheme}
-        className="fixed top-4 right-6 z-50 bg-card border border-border rounded-full p-3 hover:bg-secondary hover:scale-110"
+        className="fixed top-4 right-6 z-[60] bg-card border border-border rounded-full p-3 hover:bg-secondary hover:scale-110"
         size="icon"
         variant="ghost"
         data-testid="button-theme-toggle"
