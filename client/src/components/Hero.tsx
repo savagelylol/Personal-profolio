@@ -112,10 +112,13 @@ export function Hero() {
     
     if (JSON.stringify(newSequence) === JSON.stringify(secretSequence)) {
       setShowEasterEgg4(true);
-      localStorage.setItem('easterEgg4', 'found');
-      setTimeout(() => {
-        alert('🎉 Easter Egg #4 Found! You clicked the secret technology sequence: JavaScript → Python → Lua → SQL (JPLS - Just Passionate Learning Squad)! 🚀');
-      }, 100);
+      if (!localStorage.getItem('easterEgg4')) {
+        localStorage.setItem('easterEgg4', 'found');
+        window.dispatchEvent(new CustomEvent('easterEggFound'));
+        setTimeout(() => {
+          alert('🎉 Easter Egg #4 Found! You clicked the secret technology sequence: JavaScript → Python → Lua → SQL (JPLS - Just Passionate Learning Squad)! 🚀');
+        }, 100);
+      }
     }
   };
   
@@ -125,10 +128,13 @@ export function Hero() {
       const newCount = prev + 1;
       if (newCount === 3) {
         setShowEasterEgg3(true);
-        localStorage.setItem('easterEgg3', 'found');
-        setTimeout(() => {
-          alert('🎉 Easter Egg #3 Found! You discovered the triple-click secret! The logo loves attention! 💖');
-        }, 100);
+        if (!localStorage.getItem('easterEgg3')) {
+          localStorage.setItem('easterEgg3', 'found');
+          window.dispatchEvent(new CustomEvent('easterEggFound'));
+          setTimeout(() => {
+            alert('🎉 Easter Egg #3 Found! You discovered the triple-click secret! The logo loves attention! 💖');
+          }, 100);
+        }
         return 0; // Reset counter
       }
       return newCount;

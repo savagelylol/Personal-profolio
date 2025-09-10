@@ -66,8 +66,11 @@ export default function NotFound() {
           <h1 
             className="text-3xl font-bold text-foreground mb-4 leading-tight cursor-pointer select-none"
             onDoubleClick={() => {
-              localStorage.setItem('easterEgg5', 'found');
-              alert(hiddenMessage);
+              if (!localStorage.getItem('easterEgg5')) {
+                localStorage.setItem('easterEgg5', 'found');
+                window.dispatchEvent(new CustomEvent('easterEggFound'));
+                alert(hiddenMessage);
+              }
             }}
             data-testid="text-404-title"
           >

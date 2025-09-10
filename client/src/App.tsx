@@ -10,6 +10,7 @@ import Playground from "@/pages/playground";
 import About from "@/pages/about";
 import Skills from "@/pages/skills";
 import Timeline from "@/pages/timeline";
+import EasterEggs from "@/pages/easter-eggs";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/skills" component={Skills} />
       <Route path="/timeline" component={Timeline} />
+      <Route path="/easter-eggs" component={EasterEggs} />
       <Route component={NotFound} />
     </Switch>
   );

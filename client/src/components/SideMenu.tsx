@@ -74,8 +74,8 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
     { 
       icon: Sparkles, 
       label: 'Easter Eggs', 
-      href: '#',
-      description: '🥚 Found: 0/7',
+      href: '/easter-eggs',
+      description: '🥚 Hunt for hidden secrets',
       onClick: () => {
         // This is easter egg #1 - clicking on easter eggs menu item
         if (!localStorage.getItem('easterEgg1')) {
@@ -84,8 +84,6 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
           window.dispatchEvent(new CustomEvent('easterEggFound'));
           alert('🎉 Easter Egg #1 Found! You clicked the Easter Eggs menu item!');
         }
-        // Always show the tracker when clicking this button
-        window.dispatchEvent(new CustomEvent('showEasterEggTracker'));
       }
     }
   ];

@@ -219,8 +219,11 @@ export default function Timeline() {
                     onContextMenu={(e) => {
                       if (item.id === 'current') {
                         e.preventDefault();
-                        localStorage.setItem('easterEgg7', 'found');
-                        alert('🎉 Easter Egg #7 Found! You right-clicked on the current timeline item! Thanks for exploring every corner of my journey! 🎯');
+                        if (!localStorage.getItem('easterEgg7')) {
+                          localStorage.setItem('easterEgg7', 'found');
+                          window.dispatchEvent(new CustomEvent('easterEggFound'));
+                          alert('🎉 Easter Egg #7 Found! You right-clicked on the current timeline item! Thanks for exploring every corner of my journey! 🎯');
+                        }
                       }
                     }}
                   >

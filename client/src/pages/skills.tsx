@@ -266,8 +266,11 @@ export default function Skills() {
                 <div 
                   className="text-2xl font-bold cursor-pointer hover:animate-spin transition-all"
                   onClick={() => {
-                    localStorage.setItem('easterEgg6', 'found');
-                    alert('🎉 Easter Egg #6 Found! Infinity is not just a symbol, it\'s a mindset! ♾️ Always learning, always growing!');
+                    if (!localStorage.getItem('easterEgg6')) {
+                      localStorage.setItem('easterEgg6', 'found');
+                      window.dispatchEvent(new CustomEvent('easterEggFound'));
+                      alert('🎉 Easter Egg #6 Found! Infinity is not just a symbol, it\'s a mindset! ♾️ Always learning, always growing!');
+                    }
                   }}
                   data-testid="text-infinity"
                 >
