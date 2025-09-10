@@ -13,10 +13,14 @@ export default function Home() {
 
   useEffect(() => {
     const handleShowTracker = () => setShowEasterEggTracker(true);
+    const handleEasterEggFound = () => setShowEasterEggTracker(true);
+    
     window.addEventListener('showEasterEggTracker', handleShowTracker);
+    window.addEventListener('easterEggFound', handleEasterEggFound);
     
     return () => {
       window.removeEventListener('showEasterEggTracker', handleShowTracker);
+      window.removeEventListener('easterEggFound', handleEasterEggFound);
     };
   }, []);
 

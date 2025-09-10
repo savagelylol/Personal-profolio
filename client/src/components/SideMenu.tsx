@@ -36,6 +36,10 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
         konamiIndex++;
         if (konamiIndex === konamiCode.length) {
           setEasterEggFound(true);
+          if (!localStorage.getItem('easterEgg2')) {
+            localStorage.setItem('easterEgg2', 'found');
+            window.dispatchEvent(new CustomEvent('easterEggFound'));
+          }
           konamiIndex = 0;
         }
       } else {
@@ -84,6 +88,10 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
           window.dispatchEvent(new CustomEvent('easterEggFound'));
           alert('🎉 Easter Egg #1 Found! You clicked the Easter Eggs menu item!');
         }
+        // Navigate to easter eggs page after the discovery
+        setTimeout(() => {
+          window.location.href = '/easter-eggs';
+        }, 100);
       }
     }
   ];

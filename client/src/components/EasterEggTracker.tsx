@@ -14,6 +14,7 @@ export function EasterEggTracker({ isVisible = false, onHide }: EasterEggTracker
   const [foundEggs, setFoundEggs] = useState<string[]>([]);
   const [showReward, setShowReward] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
+  const [manuallyHidden, setManuallyHidden] = useState(false);
 
   const totalEggs = 7;
   const easterEggList = [
@@ -64,11 +65,12 @@ export function EasterEggTracker({ isVisible = false, onHide }: EasterEggTracker
     setShowRewardModal(false);
   };
 
-  // Don't render if not visible or no eggs found and not explicitly shown
-  if (!isVisible && foundEggs.length === 0) return null;
+  // Don't render if manually hidden or if not visible and no eggs found
+  const shouldShow = isVisible || (!manuallyHidden && foundEggs.length > 0);
+  if (!shouldShow) return null;
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 transition-all duration-300 ${isVisible ? 'opacity-100 scale-100' : foundEggs.length > 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+    <div className={`fixed bottom-4 right-4 z-50 transition-all duration-300 ${shouldShow ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
       <Card className="w-80 bg-card/95 backdrop-blur-sm border-primary/20">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between text-lg">
@@ -76,17 +78,18 @@ export function EasterEggTracker({ isVisible = false, onHide }: EasterEggTracker
               <Gift className="w-5 h-5 text-primary" />
               Easter Egg Progress
             </div>
-            {onHide && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onHide}
-                className="h-6 w-6 p-0 hover:bg-secondary"
-                data-testid="button-hide-tracker"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setManuallyHidden(true);
+                if (onHide) onHide();
+              }}
+              className="h-6 w-6 p-0 hover:bg-secondary"
+              data-testid="button-hide-tracker"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
