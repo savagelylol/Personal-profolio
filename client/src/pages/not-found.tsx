@@ -4,6 +4,9 @@ import { AlertCircle, Home, ArrowLeft, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 
+// Easter Egg #5: Hidden message in 404 page
+const hiddenMessage = "🎮 You found the secret! This 404 page has more personality than most homepages! 😄";
+
 export default function NotFound() {
   const [particles, setParticles] = useState<Array<{id: number, x: number, y: number, vx: number, vy: number}>>([]);
 
@@ -59,7 +62,14 @@ export default function NotFound() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-foreground mb-4 leading-tight">
+          <h1 
+            className="text-3xl font-bold text-foreground mb-4 leading-tight cursor-pointer select-none"
+            onDoubleClick={() => {
+              localStorage.setItem('easterEgg5', 'found');
+              alert(hiddenMessage);
+            }}
+            data-testid="text-404-title"
+          >
             Oops looks like you messed with the URL, maybe dont do that.
           </h1>
 

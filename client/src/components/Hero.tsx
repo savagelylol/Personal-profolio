@@ -13,6 +13,15 @@ export function Hero() {
   const [hoveredTech, setHoveredTech] = useState<string | null>(null);
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Easter Egg #3: Triple click counter on logo
+  const [logoClickCount, setLogoClickCount] = useState(0);
+  const [showEasterEgg3, setShowEasterEgg3] = useState(false);
+  
+  // Easter Egg #4: Technology sequence clicking
+  const [techSequence, setTechSequence] = useState<string[]>([]);
+  const [showEasterEgg4, setShowEasterEgg4] = useState(false);
+  const secretSequence = ['JavaScript', 'Python', 'Lua', 'SQL']; // JPLS = "Just Passionate Learning Squad"
 
   const technologies = ['Lua', 'Python', 'JavaScript', 'GoDot', 'Ruby', 'C++', 'SQL'];
 
@@ -93,18 +102,60 @@ export function Hero() {
   const handleTechClick = (tech: string) => {
     setSelectedTech(tech);
     setIsDialogOpen(true);
+    
+    // Easter Egg #4: Check for secret sequence
+    const newSequence = [...techSequence, tech];
+    if (newSequence.length > secretSequence.length) {
+      newSequence.shift();
+    }
+    setTechSequence(newSequence);
+    
+    if (JSON.stringify(newSequence) === JSON.stringify(secretSequence)) {
+      setShowEasterEgg4(true);
+      localStorage.setItem('easterEgg4', 'found');
+      setTimeout(() => {
+        alert('🎉 Easter Egg #4 Found! You clicked the secret technology sequence: JavaScript → Python → Lua → SQL (JPLS - Just Passionate Learning Squad)! 🚀');
+      }, 100);
+    }
+  };
+  
+  // Easter Egg #3: Logo triple click handler
+  const handleLogoClick = () => {
+    setLogoClickCount(prev => {
+      const newCount = prev + 1;
+      if (newCount === 3) {
+        setShowEasterEgg3(true);
+        localStorage.setItem('easterEgg3', 'found');
+        setTimeout(() => {
+          alert('🎉 Easter Egg #3 Found! You discovered the triple-click secret! The logo loves attention! 💖');
+        }, 100);
+        return 0; // Reset counter
+      }
+      return newCount;
+    });
+    
+    // Reset counter after 2 seconds if not completed
+    setTimeout(() => {
+      setLogoClickCount(prev => prev > 0 ? 0 : prev);
+    }, 2000);
   };
 
   return (
     <section id="home" className="min-h-screen flex items-center justify-center relative">
       <div className="text-center z-10">
         <h1 
-          className="text-6xl md:text-8xl font-mono font-bold mb-6 glow-text transition-all duration-300 cursor-pointer select-none" 
+          className={`text-6xl md:text-8xl font-mono font-bold mb-6 glow-text transition-all duration-300 cursor-pointer select-none ${showEasterEgg3 ? 'animate-pulse' : ''} ${logoClickCount > 0 ? 'animate-bounce' : ''}`}
           data-testid="text-hero-name"
           onMouseMove={handleTitleHover}
           onMouseLeave={handleTitleLeave}
+          onClick={handleLogoClick}
         >
           savage
+          {showEasterEgg3 && (
+            <span className="text-2xl md:text-4xl ml-4 text-yellow-500 animate-spin inline-block">
+              ⭐
+            </span>
+          )}
         </h1>
         <p className="text-xl md:text-2xl mb-8 text-muted-foreground" data-testid="text-hero-subtitle">
           <span className="text-accent font-bold">7 years</span> of crafting digital experiences

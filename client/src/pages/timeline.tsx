@@ -113,9 +113,9 @@ export default function Timeline() {
       date: 'Now',
       title: 'Continuous Growth',
       type: 'personal',
-      description: 'Always learning, always building. Currently exploring new technologies and working on exciting projects.',
+      description: 'Always learning, always building. Currently exploring new technologies and working on exciting projects. 🚀✨',
       technologies: ['Next.js', 'AI/ML', 'Cloud Technologies', 'Mobile Development'],
-      highlights: ['Learning every day', 'Building cool stuff', 'Helping others learn'],
+      highlights: ['Learning every day', 'Building cool stuff', 'Helping others learn', '🥚 Secret: Right-click me!'],
       icon: Heart,
       color: 'bg-red-500'
     }

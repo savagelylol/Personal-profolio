@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+
+// Easter Egg #6: Hidden in skills page - hover over "∞" symbol
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -260,7 +262,16 @@ export default function Skills() {
             <Card className="text-center bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20">
               <CardContent className="pt-6">
                 <Target className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">∞</div>
+                <div 
+                  className="text-2xl font-bold cursor-pointer hover:animate-spin transition-all"
+                  onClick={() => {
+                    localStorage.setItem('easterEgg6', 'found');
+                    alert('🎉 Easter Egg #6 Found! Infinity is not just a symbol, it\'s a mindset! ♾️ Always learning, always growing!');
+                  }}
+                  data-testid="text-infinity"
+                >
+                  ∞
+                </div>
                 <div className="text-sm text-muted-foreground">Learning More</div>
               </CardContent>
             </Card>

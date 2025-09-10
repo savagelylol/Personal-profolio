@@ -5,6 +5,7 @@ import { Hero } from '@/components/Hero';
 import { Skills } from '@/components/Skills';
 import { About } from '@/components/About';
 import { Contact } from '@/components/Contact';
+import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 export default function Home() {
   return (
@@ -27,6 +28,9 @@ export default function Home() {
           </p>
         </div>
       </footer>
+      
+      {/* Easter Egg Tracker */}
+      <EasterEggTracker />
     </div>
   );
 }

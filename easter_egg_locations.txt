@@ -1,0 +1,78 @@
+🥚 SAVAGE.DEV EASTER EGG HUNT 🥚
+===================================
+
+Welcome to the ultimate easter egg hunt! There are 7 hidden easter eggs scattered throughout the website. 
+
+Find them all to unlock a special reward! 🏆
+
+EASTER EGG LOCATIONS:
+=====================
+
+🥚 Easter Egg #1: "Menu Explorer"
+   Location: Side Menu (Hamburger menu)
+   How to find: Click the hamburger menu button (3 lines) in the navigation, then click on the "Easter Eggs" menu item
+   Hint: Sometimes the obvious choice is the right choice!
+
+🥚 Easter Egg #2: "Konami Master" 
+   Location: Side Menu (when open)
+   How to find: Open the side menu and enter the classic Konami code: ↑ ↑ ↓ ↓ ← → ← → B A
+   Hint: Up, up, down, down, left, right, left, right, B, A - the most famous cheat code in gaming history!
+
+🥚 Easter Egg #3: "Logo Lover"
+   Location: Home page - Main logo
+   How to find: Triple-click on the "savage" logo/text on the home page
+   Hint: Show the logo some love! Sometimes persistence pays off...
+
+🥚 Easter Egg #4: "Tech Sequence"
+   Location: Home page - Technology badges
+   How to find: Click the technology badges in this exact sequence: JavaScript → Python → Lua → SQL
+   Hint: JPLS = "Just Passionate Learning Squad" - the secret behind my coding journey!
+
+🥚 Easter Egg #5: "404 Detective"
+   Location: 404 Not Found page
+   How to find: Double-click on the 404 page title that says "Oops looks like you messed with the URL, maybe dont do that."
+   Hint: Even error pages deserve some attention! Double-click the title.
+
+🥚 Easter Egg #6: "Infinity Seeker"
+   Location: Skills page - Stats section
+   How to find: Click on the infinity symbol (∞) in the "Learning More" stat card
+   Hint: Infinity is not just a symbol, it's a mindset!
+
+🥚 Easter Egg #7: "Timeline Explorer"
+   Location: My Journey (Timeline) page
+   How to find: Right-click on the "Continuous Growth" timeline item (the current/latest one)
+   Hint: Sometimes you need to think outside the left-click box!
+
+REWARD SYSTEM:
+==============
+
+🎁 When you find your first easter egg, a progress tracker will appear in the bottom-right corner
+📊 Track your progress as you find each egg (shows X/7 found)
+🏆 Find all 7 eggs to unlock the ultimate reward message!
+✨ Each egg gives you a unique congratulatory message
+🎉 The final reward celebrates your curiosity and attention to detail!
+
+SPECIAL FEATURES:
+================
+
+🔄 Progress is saved in your browser - refresh and your progress remains!
+🎯 Each easter egg has a unique personality and message
+📍 The tracker only appears after you find your first egg (no spoilers!)
+🎨 Visual feedback and animations when you find each egg
+🚀 Finding all eggs proves you have the curiosity that makes a great developer!
+
+HINTS & TIPS:
+=============
+
+💡 Some eggs require clicking, others need key combinations
+🖱️ Try different types of clicks (single, double, triple, right-click)
+⌨️ Some might need keyboard input
+🧐 Read text carefully - sometimes there are clues hidden in plain sight
+🎮 Think like a gamer - some easter eggs use classic gaming references
+🔍 Explore every corner of the site
+😄 Have fun! That's the most important part!
+
+Built with ❤️ by savage.dev
+Inspired by turflix and expois! 🚀
+
+Happy hunting! 🥚🎉
