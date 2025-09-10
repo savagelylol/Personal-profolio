@@ -12,8 +12,10 @@ import {
   TrendingUp,
   Sparkles,
   Award,
-  Target
+  Target,
+  ArrowLeft
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Skills() {
   const [selectedCategory, setSelectedCategory] = useState('frontend');
@@ -116,6 +118,16 @@ export default function Skills() {
       <div className="relative z-10 container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto space-y-8">
           
+          {/* Back Navigation */}
+          <div className="flex items-center gap-4 mb-6">
+            <Button variant="outline" size="sm" asChild data-testid="button-back">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Link>
+            </Button>
+          </div>
+
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">

@@ -72,8 +72,8 @@ export function Contact() {
   };
 
   const socialLinks = [
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
+    { icon: Github, href: 'https://github.com/savagelylol', label: 'GitHub' },
+    { icon: Twitter, href: 'https://twitter.com/savagelylol', label: 'Twitter' },
     { icon: MessageSquare, href: '#', label: 'Discord' },
     { icon: Mail, href: '#', label: 'Email' }
   ];

@@ -7,35 +7,38 @@ import {
   MapPin, 
   Calendar, 
   Heart, 
-  Coffee,
   Music,
   Gamepad2,
   Code,
   Sparkles,
   Github,
   Twitter,
-  Mail
+  Mail,
+  ArrowLeft
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function About() {
   const [funFactIndex, setFunFactIndex] = useState(0);
 
   const funFacts = [
     "🎮 I've built over 15 games in Roblox with millions of plays combined",
-    "☕ I can't code without my perfect cup of coffee - it's basically my programming fuel",
+    "👫 All of this started because of my awesome friends turflix and expois - they inspired me to get into coding",
     "🎵 I code best with lo-fi beats playing in the background",
     "🌙 I'm a night owl - my best coding happens after midnight",
     "🎯 I once debugged a problem for 6 hours straight and the fix was a missing semicolon",
     "🚀 My dream is to create games that bring people together like Roblox did for me",
     "🎨 I taught myself design because I got tired of my apps looking terrible",
-    "⚡ I type at 95+ WPM when I'm in the zone"
+    "⚡ I type at 105+ WPM when I'm in the zone",
+    "💻 I'm always learning new things - currently exploring AI and machine learning",
+    "Super secret fun fact: idk what to put here, lol"
   ];
 
   const interests = [
     { icon: Gamepad2, name: "Game Development", desc: "Creating immersive experiences" },
     { icon: Code, name: "Web Development", desc: "Building modern applications" },
     { icon: Music, name: "Music Production", desc: "Creating beats and melodies" },
-    { icon: Coffee, name: "Coffee Brewing", desc: "Perfecting the perfect cup" }
+    { icon: Heart, name: "Helping Friends", desc: "Supporting turflix and expois" }
   ];
 
   const nextFunFact = () => {
@@ -66,13 +69,23 @@ export default function About() {
       <div className="relative z-10 container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto space-y-8">
           
+          {/* Back Navigation */}
+          <div className="flex items-center gap-4 mb-6">
+            <Button variant="outline" size="sm" asChild data-testid="button-back">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Link>
+            </Button>
+          </div>
+
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
               About Me
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A passionate developer who turns coffee into code and ideas into reality
+              A passionate developer inspired by great friends to turn ideas into reality
             </p>
           </div>
 
@@ -91,7 +104,7 @@ export default function About() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span>Based somewhere awesome</span>
+                    <span>Based in Las Vegas</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -166,7 +179,7 @@ export default function About() {
               <div className="text-center space-y-4">
                 <div className="flex justify-center gap-2 flex-wrap">
                   <Badge variant="secondary" className="animate-pulse">
-                    <Coffee className="w-3 h-3 mr-1" />
+                    <Code className="w-3 h-3 mr-1" />
                     Currently Coding
                   </Badge>
                   <Badge variant="outline">
@@ -179,7 +192,7 @@ export default function About() {
                 
                 <p className="text-lg">
                   Right now I'm working on making this portfolio even more interactive and 
-                  building some exciting new projects. Stay tuned! ✨
+                  building some exciting new projects with inspiration from turflix and expois. Stay tuned! ✨
                 </p>
 
                 <div className="flex justify-center gap-4 pt-4">
@@ -190,7 +203,7 @@ export default function About() {
                     </a>
                   </Button>
                   <Button variant="outline" size="sm" asChild data-testid="link-twitter">
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                    <a href="https://twitter.com/savagelylol" target="_blank" rel="noopener noreferrer">
                       <Twitter className="w-4 h-4 mr-2" />
                       Twitter
                     </a>
