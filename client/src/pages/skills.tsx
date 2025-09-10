@@ -18,6 +18,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { Link } from "wouter";
+import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 export default function Skills() {
   const [selectedCategory, setSelectedCategory] = useState('frontend');
@@ -279,6 +280,9 @@ export default function Skills() {
 
         </div>
       </div>
+      
+      {/* Easter Egg Tracker */}
+      <EasterEggTracker />
     </div>
   );
 }

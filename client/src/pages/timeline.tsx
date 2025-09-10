@@ -16,6 +16,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { Link } from "wouter";
+import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 interface TimelineItem {
   id: string;
@@ -215,6 +216,13 @@ export default function Timeline() {
                       animationDelay: `${index * 0.1}s`,
                       opacity: 0
                     }}
+                    onContextMenu={(e) => {
+                      if (item.id === 'current') {
+                        e.preventDefault();
+                        localStorage.setItem('easterEgg7', 'found');
+                        alert('🎉 Easter Egg #7 Found! You right-clicked on the current timeline item! Thanks for exploring every corner of my journey! 🎯');
+                      }
+                    }}
                   >
                     {/* Timeline Node */}
                     <div className="hidden sm:flex">
@@ -326,6 +334,9 @@ export default function Timeline() {
           }
         }
       `}</style>
+      
+      {/* Easter Egg Tracker */}
+      <EasterEggTracker />
     </div>
   );
 }

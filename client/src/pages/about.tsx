@@ -17,6 +17,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { Link } from "wouter";
+import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 export default function About() {
   const [funFactIndex, setFunFactIndex] = useState(0);
@@ -221,6 +222,9 @@ export default function About() {
 
         </div>
       </div>
+      
+      {/* Easter Egg Tracker */}
+      <EasterEggTracker />
     </div>
   );
 }

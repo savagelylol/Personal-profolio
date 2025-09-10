@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, ExternalLink, Github, Star, GitFork, ArrowLeft, Users, Eye } from 'lucide-react';
 import { Link } from 'wouter';
+import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 interface GitHubRepo {
   id: number;

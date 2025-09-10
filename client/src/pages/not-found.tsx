@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, Home, ArrowLeft, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
+import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 // Easter Egg #5: Hidden message in 404 page
 const hiddenMessage = "🎮 You found the secret! This 404 page has more personality than most homepages! 😄";
@@ -121,6 +122,9 @@ export default function NotFound() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Easter Egg Tracker */}
+      <EasterEggTracker />
     </div>
   );
 }
