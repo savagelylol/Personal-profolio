@@ -78,8 +78,14 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
       description: '🥚 Found: 0/7',
       onClick: () => {
         // This is easter egg #1 - clicking on easter eggs menu item
-        localStorage.setItem('easterEgg1', 'found');
-        alert('🎉 Easter Egg #1 Found! You clicked the Easter Eggs menu item!');
+        if (!localStorage.getItem('easterEgg1')) {
+          localStorage.setItem('easterEgg1', 'found');
+          // Dispatch custom event for live updates
+          window.dispatchEvent(new CustomEvent('easterEggFound'));
+          alert('🎉 Easter Egg #1 Found! You clicked the Easter Eggs menu item!');
+        }
+        // Always show the tracker when clicking this button
+        window.dispatchEvent(new CustomEvent('showEasterEggTracker'));
       }
     }
   ];

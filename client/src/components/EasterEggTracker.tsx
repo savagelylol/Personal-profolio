@@ -2,10 +2,15 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gift, Trophy, Star } from 'lucide-react';
+import { Gift, Trophy, Star, X } from 'lucide-react';
 import { EasterEggReward } from './EasterEggReward';
 
-export function EasterEggTracker() {
+interface EasterEggTrackerProps {
+  isVisible?: boolean;
+  onHide?: () => void;
+}
+
+export function EasterEggTracker({ isVisible = false, onHide }: EasterEggTrackerProps) {
   const [foundEggs, setFoundEggs] = useState<string[]>([]);
   const [showReward, setShowReward] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
@@ -21,15 +26,32 @@ export function EasterEggTracker() {
     { id: 'easterEgg7', name: 'Timeline Explorer', hint: 'Right-click on the current timeline item' }
   ];
 
+  // Live updating effect
   useEffect(() => {
-    const found = easterEggList
-      .map(egg => egg.id)
-      .filter(id => localStorage.getItem(id) === 'found');
-    setFoundEggs(found);
+    const updateFoundEggs = () => {
+      const found = easterEggList
+        .map(egg => egg.id)
+        .filter(id => localStorage.getItem(id) === 'found');
+      setFoundEggs(found);
 
-    if (found.length === totalEggs && !localStorage.getItem('rewardClaimed')) {
-      setShowReward(true);
-    }
+      if (found.length === totalEggs && !localStorage.getItem('rewardClaimed')) {
+        setShowReward(true);
+      }
+    };
+
+    // Initial load
+    updateFoundEggs();
+
+    // Listen for localStorage changes
+    window.addEventListener('storage', updateFoundEggs);
+    
+    // Custom event for same-page updates
+    window.addEventListener('easterEggFound', updateFoundEggs);
+
+    return () => {
+      window.removeEventListener('storage', updateFoundEggs);
+      window.removeEventListener('easterEggFound', updateFoundEggs);
+    };
   }, []);
 
   const claimReward = () => {
@@ -42,16 +64,29 @@ export function EasterEggTracker() {
     setShowRewardModal(false);
   };
 
-  // Don't render anything if no eggs found
-  if (foundEggs.length === 0) return null;
+  // Don't render if not visible or no eggs found and not explicitly shown
+  if (!isVisible && foundEggs.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className={`fixed bottom-4 right-4 z-50 transition-all duration-300 ${isVisible ? 'opacity-100 scale-100' : foundEggs.length > 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
       <Card className="w-80 bg-card/95 backdrop-blur-sm border-primary/20">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Gift className="w-5 h-5 text-primary" />
-            Easter Egg Progress
+          <CardTitle className="flex items-center justify-between text-lg">
+            <div className="flex items-center gap-2">
+              <Gift className="w-5 h-5 text-primary" />
+              Easter Egg Progress
+            </div>
+            {onHide && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onHide}
+                className="h-6 w-6 p-0 hover:bg-secondary"
+                data-testid="button-hide-tracker"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">

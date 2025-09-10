@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { CursorGlow } from '@/components/CursorGlow';
 import { FloatingBackground } from '@/components/FloatingBackground';
 import { Navigation } from '@/components/Navigation';
@@ -8,6 +9,17 @@ import { Contact } from '@/components/Contact';
 import { EasterEggTracker } from '@/components/EasterEggTracker';
 
 export default function Home() {
+  const [showEasterEggTracker, setShowEasterEggTracker] = useState(false);
+
+  useEffect(() => {
+    const handleShowTracker = () => setShowEasterEggTracker(true);
+    window.addEventListener('showEasterEggTracker', handleShowTracker);
+    
+    return () => {
+      window.removeEventListener('showEasterEggTracker', handleShowTracker);
+    };
+  }, []);
+
   return (
     <div className="bg-background text-foreground font-sans overflow-x-hidden">
       <CursorGlow />
@@ -30,7 +42,10 @@ export default function Home() {
       </footer>
       
       {/* Easter Egg Tracker */}
-      <EasterEggTracker />
+      <EasterEggTracker 
+        isVisible={showEasterEggTracker}
+        onHide={() => setShowEasterEggTracker(false)}
+      />
     </div>
   );
 }
