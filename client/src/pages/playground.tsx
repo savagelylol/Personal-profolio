@@ -471,7 +471,7 @@ function Game3D() {
           <Button
             size="sm"
             onClick={() => {
-              setCarState({ x: 50, y: 300, velocityX: 0, velocityY: 0, rotation: 0, onGround: true });
+              setCarState({ x: 0, y: 5, z: 100, velocityX: 0, velocityY: 0, velocityZ: 0, rotationX: 0, rotationY: 0, rotationZ: 0, onGround: true });
               setScore(0);
             }}
           >

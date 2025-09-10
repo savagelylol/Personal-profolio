@@ -36,7 +36,7 @@ export function Navigation() {
           <div className="font-mono text-xl font-bold glow-text" data-testid="text-logo">
             savage.dev
           </div>
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex space-x-6">
             <button 
               onClick={() => scrollToSection('home')}
               className="hover:text-primary transition-colors"
@@ -44,13 +44,30 @@ export function Navigation() {
             >
               Home
             </button>
-            <button 
-              onClick={() => scrollToSection('skills')}
-              className="hover:text-primary transition-colors"
-              data-testid="link-skills"
-            >
-              Skills
-            </button>
+            <Link href="/about">
+              <button 
+                className="hover:text-primary transition-colors"
+                data-testid="link-about"
+              >
+                About
+              </button>
+            </Link>
+            <Link href="/skills">
+              <button 
+                className="hover:text-primary transition-colors"
+                data-testid="link-skills"
+              >
+                Skills
+              </button>
+            </Link>
+            <Link href="/timeline">
+              <button 
+                className="hover:text-primary transition-colors"
+                data-testid="link-timeline"
+              >
+                Journey
+              </button>
+            </Link>
             <Link href="/projects">
               <button 
                 className="hover:text-primary transition-colors"
@@ -67,13 +84,6 @@ export function Navigation() {
                 Playground
               </button>
             </Link>
-            <button 
-              onClick={() => scrollToSection('about')}
-              className="hover:text-primary transition-colors"
-              data-testid="link-about"
-            >
-              About
-            </button>
             <button 
               onClick={() => scrollToSection('contact')}
               className="hover:text-primary transition-colors"

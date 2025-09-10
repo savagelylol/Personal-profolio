@@ -7,6 +7,9 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Home from "@/pages/home";
 import Projects from "@/pages/projects";
 import Playground from "@/pages/playground";
+import About from "@/pages/about";
+import Skills from "@/pages/skills";
+import Timeline from "@/pages/timeline";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -15,6 +18,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/projects" component={Projects} />
       <Route path="/playground" component={Playground} />
+      <Route path="/about" component={About} />
+      <Route path="/skills" component={Skills} />
+      <Route path="/timeline" component={Timeline} />
       <Route component={NotFound} />
     </Switch>
   );
