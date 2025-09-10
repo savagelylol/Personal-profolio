@@ -25,27 +25,45 @@ interface CodeSnippet {
   description: string;
 }
 
-// Car Physics Game Component
+// 3D Car Physics Game Component
 function Game3D() {
   const gameCanvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState({
     carColor: '#ff4444',
     speed: 5,
     friction: 0.95,
-    gravity: 0.5,
+    gravity: 0.8,
     bounceHeight: 15
   });
   const [carState, setCarState] = useState({
-    x: 200,
-    y: 200,
+    x: 0,
+    y: 0,
+    z: 0,
     velocityX: 0,
     velocityY: 0,
-    rotation: 0,
-    onGround: false
+    velocityZ: 0,
+    rotationX: 0,
+    rotationY: 0,
+    rotationZ: 0,
+    onGround: true
+  });
+  const [cameraState, setCameraState] = useState({
+    x: 0,
+    y: -100,
+    z: 150,
+    lookAtX: 0,
+    lookAtY: 0,
+    lookAtZ: 0
   });
   const [keys, setKeys] = useState<{[key: string]: boolean}>({});
   const [gameAnimationId, setGameAnimationId] = useState<number>();
   const [score, setScore] = useState(0);
+  const keysRef = useRef(keys);
+
+  // Update keys ref to avoid stale closure
+  useEffect(() => {
+    keysRef.current = keys;
+  }, [keys]);
 
   useEffect(() => {
     const canvas = gameCanvasRef.current;
@@ -54,195 +72,355 @@ function Game3D() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 500;
-    canvas.height = 350;
+    canvas.width = 600;
+    canvas.height = 400;
 
-    // Track creation for racing
+    // 3D world objects
+    const ground = { y: 0, size: 300 };
     const obstacles = [
-      { x: 100, y: 250, width: 80, height: 20 },
-      { x: 300, y: 180, width: 60, height: 15 },
-      { x: 420, y: 280, width: 70, height: 25 },
+      { x: -50, y: 10, z: -50, width: 30, height: 20, depth: 30 },
+      { x: 80, y: 10, z: 20, width: 25, height: 15, depth: 25 },
+      { x: -80, y: 10, z: 80, width: 40, height: 25, depth: 20 },
     ];
+    const finish = { x: 0, y: 5, z: -120, width: 60, height: 30, depth: 10 };
 
-    const finish = { x: 450, y: 50, width: 50, height: 40 };
-
-    function drawCar(x: number, y: number, rotation: number) {
-      ctx!.save();
-      ctx!.translate(x, y);
-      ctx!.rotate(rotation);
+    // 3D transformation functions
+    function project3D(x: number, y: number, z: number, camera: typeof cameraState) {
+      // Translate to camera space
+      const dx = x - camera.x;
+      const dy = y - camera.y;
+      const dz = z - camera.z;
       
-      // Car body
-      ctx!.fillStyle = gameState.carColor;
-      ctx!.fillRect(-15, -8, 30, 16);
+      // Simple perspective projection
+      const scale = 300 / (300 + dz);
+      const screenX = canvas!.width / 2 + dx * scale;
+      const screenY = canvas!.height / 2 - dy * scale;
       
-      // Car details
-      ctx!.fillStyle = '#333';
-      ctx!.fillRect(-12, -6, 24, 3); // windshield
-      ctx!.fillRect(-12, 3, 24, 3);  // back window
-      
-      // Wheels
-      ctx!.fillStyle = '#222';
-      ctx!.beginPath();
-      ctx!.arc(-8, -10, 3, 0, Math.PI * 2);
-      ctx!.arc(8, -10, 3, 0, Math.PI * 2);
-      ctx!.arc(-8, 10, 3, 0, Math.PI * 2);
-      ctx!.arc(8, 10, 3, 0, Math.PI * 2);
-      ctx!.fill();
-      
-      ctx!.restore();
+      return { x: screenX, y: screenY, scale, depth: dz };
     }
 
-    function drawTrack() {
-      // Background
-      ctx!.fillStyle = '#2a4a3a';
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
-      
-      // Track borders
-      ctx!.fillStyle = '#8B4513';
-      ctx!.fillRect(0, 0, canvas!.width, 10);
-      ctx!.fillRect(0, canvas!.height - 10, canvas!.width, 10);
-      ctx!.fillRect(0, 0, 10, canvas!.height);
-      ctx!.fillRect(canvas!.width - 10, 0, 10, canvas!.height);
-      
-      // Obstacles
-      ctx!.fillStyle = '#654321';
-      obstacles.forEach(obs => {
-        ctx!.fillRect(obs.x, obs.y, obs.width, obs.height);
+    function drawCar3D(car: typeof carState, camera: typeof cameraState) {
+      const carPoints = [
+        // Car body vertices (3D box)
+        [-15, 0, -8], [15, 0, -8], [15, 15, -8], [-15, 15, -8],  // bottom
+        [-15, 0, 8], [15, 0, 8], [15, 15, 8], [-15, 15, 8],      // top
+      ];
+
+      // Transform car points
+      const transformedPoints = carPoints.map(([px, py, pz]) => {
+        // Apply car rotation
+        const cosY = Math.cos(car.rotationY);
+        const sinY = Math.sin(car.rotationY);
+        const cosX = Math.cos(car.rotationX);
+        const sinX = Math.sin(car.rotationX);
+        
+        // Rotate around Y axis (turning)
+        let x = px * cosY + pz * sinY;
+        let y = py;
+        let z = -px * sinY + pz * cosY;
+        
+        // Rotate around X axis (pitch)
+        const newY = y * cosX - z * sinX;
+        z = y * sinX + z * cosX;
+        y = newY;
+        
+        // Translate to car position
+        x += car.x;
+        y += car.y;
+        z += car.z;
+        
+        return project3D(x, y, z, camera);
       });
+
+      // Draw car faces (simplified 3D rendering)
+      const faces = [
+        [0, 1, 5, 4], // front
+        [1, 2, 6, 5], // right
+        [2, 3, 7, 6], // back
+        [3, 0, 4, 7], // left
+        [4, 5, 6, 7], // top
+        [0, 3, 2, 1]  // bottom
+      ];
+
+      // Sort faces by depth for proper rendering
+      const facesWithDepth = faces.map((face, index) => {
+        const avgDepth = face.reduce((sum, pointIndex) => 
+          sum + transformedPoints[pointIndex].depth, 0) / face.length;
+        return { face, depth: avgDepth, index };
+      }).sort((a, b) => a.depth - b.depth);
+
+      facesWithDepth.forEach(({ face, index }) => {
+        ctx!.beginPath();
+        face.forEach((pointIndex, i) => {
+          const point = transformedPoints[pointIndex];
+          if (i === 0) ctx!.moveTo(point.x, point.y);
+          else ctx!.lineTo(point.x, point.y);
+        });
+        ctx!.closePath();
+
+        // Different shades for different faces
+        const brightness = Math.max(0.3, 1 - Math.abs(index - 2) * 0.2);
+        const color = gameState.carColor;
+        const r = parseInt(color.slice(1, 3), 16) * brightness;
+        const g = parseInt(color.slice(3, 5), 16) * brightness;
+        const b = parseInt(color.slice(5, 7), 16) * brightness;
+        
+        ctx!.fillStyle = `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
+        ctx!.fill();
+        ctx!.strokeStyle = '#000';
+        ctx!.lineWidth = 1;
+        ctx!.stroke();
+      });
+
+      // Draw wheels
+      const wheelPositions = [
+        [-10, -5, -6], [10, -5, -6], [-10, -5, 6], [10, -5, 6]
+      ];
       
-      // Finish line
-      ctx!.fillStyle = '#FFD700';
-      ctx!.strokeStyle = '#FF0000';
-      ctx!.lineWidth = 3;
-      ctx!.fillRect(finish.x, finish.y, finish.width, finish.height);
-      ctx!.strokeRect(finish.x, finish.y, finish.width, finish.height);
-      
-      // Checkered pattern
-      for (let i = 0; i < finish.width; i += 10) {
-        for (let j = 0; j < finish.height; j += 10) {
-          if ((i + j) % 20 === 0) {
-            ctx!.fillStyle = '#000';
-            ctx!.fillRect(finish.x + i, finish.y + j, 10, 10);
-          }
-        }
-      }
+      wheelPositions.forEach(([wx, wy, wz]) => {
+        const cosY = Math.cos(car.rotationY);
+        const sinY = Math.sin(car.rotationY);
+        const x = wx * cosY + wz * sinY + car.x;
+        const y = wy + car.y;
+        const z = -wx * sinY + wz * cosY + car.z;
+        
+        const wheel = project3D(x, y, z, camera);
+        ctx!.beginPath();
+        ctx!.arc(wheel.x, wheel.y, 4 * wheel.scale, 0, Math.PI * 2);
+        ctx!.fillStyle = '#222';
+        ctx!.fill();
+      });
     }
 
-    function checkCollisions(newX: number, newY: number) {
-      // Wall collisions
-      if (newX < 15 || newX > canvas!.width - 15 || newY < 15 || newY > canvas!.height - 15) {
-        return true;
+    function draw3DWorld(camera: typeof cameraState) {
+      // Clear canvas with sky gradient
+      const gradient = ctx!.createLinearGradient(0, 0, 0, canvas!.height);
+      gradient.addColorStop(0, '#87CEEB');
+      gradient.addColorStop(1, '#98FB98');
+      ctx!.fillStyle = gradient;
+      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+
+      // Draw ground plane
+      const groundPoints = [
+        [-ground.size, 0, -ground.size],
+        [ground.size, 0, -ground.size],
+        [ground.size, 0, ground.size],
+        [-ground.size, 0, ground.size]
+      ].map(([x, y, z]) => project3D(x, y, z, camera));
+
+      ctx!.beginPath();
+      groundPoints.forEach((point, i) => {
+        if (i === 0) ctx!.moveTo(point.x, point.y);
+        else ctx!.lineTo(point.x, point.y);
+      });
+      ctx!.closePath();
+      ctx!.fillStyle = '#228B22';
+      ctx!.fill();
+
+      // Draw obstacles
+      obstacles.forEach(obs => {
+        const corners = [
+          [-obs.width/2, 0, -obs.depth/2],
+          [obs.width/2, 0, -obs.depth/2],
+          [obs.width/2, obs.height, -obs.depth/2],
+          [-obs.width/2, obs.height, -obs.depth/2],
+          [-obs.width/2, 0, obs.depth/2],
+          [obs.width/2, 0, obs.depth/2],
+          [obs.width/2, obs.height, obs.depth/2],
+          [-obs.width/2, obs.height, obs.depth/2]
+        ].map(([x, y, z]) => project3D(x + obs.x, y + obs.y, z + obs.z, camera));
+
+        // Draw obstacle faces
+        const obsFaces = [[0,1,2,3], [4,7,6,5], [0,4,5,1], [2,6,7,3], [0,3,7,4], [1,5,6,2]];
+        obsFaces.forEach(face => {
+          ctx!.beginPath();
+          face.forEach((i, idx) => {
+            const point = corners[i];
+            if (idx === 0) ctx!.moveTo(point.x, point.y);
+            else ctx!.lineTo(point.x, point.y);
+          });
+          ctx!.closePath();
+          ctx!.fillStyle = '#8B4513';
+          ctx!.fill();
+          ctx!.strokeStyle = '#654321';
+          ctx!.stroke();
+        });
+      });
+
+      // Draw finish line
+      const finishCorners = [
+        [-finish.width/2, 0, -finish.depth/2],
+        [finish.width/2, 0, -finish.depth/2],
+        [finish.width/2, finish.height, -finish.depth/2],
+        [-finish.width/2, finish.height, -finish.depth/2],
+        [-finish.width/2, 0, finish.depth/2],
+        [finish.width/2, 0, finish.depth/2],
+        [finish.width/2, finish.height, finish.depth/2],
+        [-finish.width/2, finish.height, finish.depth/2]
+      ].map(([x, y, z]) => project3D(x + finish.x, y + finish.y, z + finish.z, camera));
+
+      // Checkered finish pattern
+      ctx!.fillStyle = '#FFD700';
+      [[0,1,2,3], [4,7,6,5]].forEach(face => {
+        ctx!.beginPath();
+        face.forEach((i, idx) => {
+          const point = finishCorners[i];
+          if (idx === 0) ctx!.moveTo(point.x, point.y);
+          else ctx!.lineTo(point.x, point.y);
+        });
+        ctx!.closePath();
+        ctx!.fill();
+      });
+    }
+
+    function checkCollisions3D(newX: number, newY: number, newZ: number) {
+      // Ground collision
+      if (newY < 0) return { collision: true, type: 'ground' };
+      
+      // World boundaries
+      if (Math.abs(newX) > ground.size - 20 || Math.abs(newZ) > ground.size - 20) {
+        return { collision: true, type: 'boundary' };
       }
       
       // Obstacle collisions
       for (const obs of obstacles) {
-        if (newX > obs.x - 15 && newX < obs.x + obs.width + 15 &&
-            newY > obs.y - 15 && newY < obs.y + obs.height + 15) {
-          return true;
+        if (Math.abs(newX - obs.x) < obs.width/2 + 15 &&
+            newY < obs.height + 10 &&
+            Math.abs(newZ - obs.z) < obs.depth/2 + 15) {
+          return { collision: true, type: 'obstacle' };
         }
       }
       
-      return false;
-    }
-
-    function checkFinish(x: number, y: number) {
-      return x > finish.x && x < finish.x + finish.width &&
-             y > finish.y && y < finish.y + finish.height;
+      return { collision: false, type: 'none' };
     }
 
     function animate() {
-      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
-      drawTrack();
-
+      const currentKeys = keysRef.current;
+      
       setCarState(prev => {
-        let { x, y, velocityX, velocityY, rotation } = prev;
+        let { x, y, z, velocityX, velocityY, velocityZ, rotationY, rotationX } = prev;
         
-        // Handle input
-        if (keys['ArrowUp'] || keys['w']) {
-          velocityX += Math.cos(rotation) * gameState.speed * 0.1;
-          velocityY += Math.sin(rotation) * gameState.speed * 0.1;
+        // Handle input (no errors now!)
+        if (currentKeys['ArrowUp'] || currentKeys['w'] || currentKeys['W']) {
+          const speed = gameState.speed * 0.5;
+          velocityX += Math.sin(rotationY) * speed;
+          velocityZ += Math.cos(rotationY) * speed;
         }
-        if (keys['ArrowDown'] || keys['s']) {
-          velocityX -= Math.cos(rotation) * gameState.speed * 0.05;
-          velocityY -= Math.sin(rotation) * gameState.speed * 0.05;
+        if (currentKeys['ArrowDown'] || currentKeys['s'] || currentKeys['S']) {
+          const speed = gameState.speed * 0.3;
+          velocityX -= Math.sin(rotationY) * speed;
+          velocityZ -= Math.cos(rotationY) * speed;
         }
-        if (keys['ArrowLeft'] || keys['a']) {
-          rotation -= 0.1;
+        if (currentKeys['ArrowLeft'] || currentKeys['a'] || currentKeys['A']) {
+          rotationY -= 0.05;
         }
-        if (keys['ArrowRight'] || keys['d']) {
-          rotation += 0.1;
+        if (currentKeys['ArrowRight'] || currentKeys['d'] || currentKeys['D']) {
+          rotationY += 0.05;
         }
-        if (keys[' ']) { // Spacebar for boost
-          velocityX += Math.cos(rotation) * gameState.speed * 0.2;
-          velocityY += Math.sin(rotation) * gameState.speed * 0.2;
+        if (currentKeys[' ']) { // Spacebar for jump
+          if (y <= 5) velocityY = 20;
         }
 
+        // Apply gravity
+        velocityY -= gameState.gravity;
+        
         // Apply friction
         velocityX *= gameState.friction;
-        velocityY *= gameState.friction;
+        velocityZ *= gameState.friction;
+        velocityY *= 0.98;
 
         // Calculate new position
         const newX = x + velocityX;
         const newY = y + velocityY;
+        const newZ = z + velocityZ;
 
         // Check collisions
-        if (checkCollisions(newX, newY)) {
-          // Bounce off walls/obstacles
-          velocityX *= -0.5;
-          velocityY *= -0.5;
+        const collision = checkCollisions3D(newX, newY, newZ);
+        
+        if (collision.collision) {
+          if (collision.type === 'ground') {
+            y = 0;
+            velocityY = 0;
+            rotationX *= 0.9; // Stabilize pitch
+          } else {
+            // Bounce off obstacles/boundaries
+            velocityX *= -0.3;
+            velocityZ *= -0.3;
+            velocityY = Math.abs(velocityY) * 0.5;
+          }
         } else {
           x = newX;
           y = newY;
+          z = newZ;
         }
+
+        // Add slight pitch based on movement
+        rotationX = Math.sin(Date.now() * 0.01) * 0.05 * Math.sqrt(velocityX**2 + velocityZ**2);
 
         // Check finish line
-        if (checkFinish(x, y)) {
+        if (Math.abs(x - finish.x) < finish.width/2 && 
+            Math.abs(z - finish.z) < finish.depth/2 && 
+            y < finish.height + 10) {
           setScore(prev => prev + 10);
-          // Reset car position
-          x = 50;
-          y = 300;
-          velocityX = 0;
-          velocityY = 0;
+          // Reset position
+          x = 0; y = 5; z = 100;
+          velocityX = velocityY = velocityZ = 0;
         }
 
-        return { x, y, velocityX, velocityY, rotation, onGround: true };
+        return { x, y, z, velocityX, velocityY, velocityZ, rotationX, rotationY, rotationZ: 0, onGround: y <= 5 };
       });
 
-      // Draw car
-      drawCar(carState.x, carState.y, carState.rotation);
+      // Update camera to follow car with offset
+      setCameraState(prev => ({
+        ...prev,
+        x: carState.x * 0.1 + prev.x * 0.9,
+        y: (carState.y + 50) * 0.1 + prev.y * 0.9,
+        z: (carState.z + 150) * 0.1 + prev.z * 0.9
+      }));
+
+      // Draw everything
+      draw3DWorld(cameraState);
+      drawCar3D(carState, cameraState);
       
       // Draw UI
-      ctx!.fillStyle = '#fff';
+      ctx!.fillStyle = '#000';
       ctx!.font = '16px monospace';
       ctx!.fillText(`Score: ${score}`, 20, 30);
-      ctx!.fillText(`Speed: ${Math.sqrt(carState.velocityX**2 + carState.velocityY**2).toFixed(1)}`, 20, 50);
+      ctx!.fillText(`Speed: ${Math.sqrt(carState.velocityX**2 + carState.velocityZ**2).toFixed(1)}`, 20, 50);
+      ctx!.fillText(`Altitude: ${carState.y.toFixed(1)}`, 20, 70);
 
       const id = requestAnimationFrame(animate);
       setGameAnimationId(id);
     }
 
-    // Keyboard event handlers
+    // Keyboard event handlers - fixed to prevent errors
     const handleKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      setKeys(prev => ({ ...prev, [e.key]: true }));
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
+        e.preventDefault();
+        setKeys(prev => ({ ...prev, [e.key]: true }));
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      e.preventDefault();
-      setKeys(prev => ({ ...prev, [e.key]: false }));
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
+        e.preventDefault();
+        setKeys(prev => ({ ...prev, [e.key]: false }));
+      }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    // Focus the canvas for keyboard input
+    canvas.focus();
+    canvas.addEventListener('keydown', handleKeyDown);
+    canvas.addEventListener('keyup', handleKeyUp);
 
     animate();
 
     return () => {
       if (gameAnimationId) cancelAnimationFrame(gameAnimationId);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      canvas.removeEventListener('keydown', handleKeyDown);
+      canvas.removeEventListener('keyup', handleKeyUp);
     };
-  }, [gameState, carState, keys, score]);
+  }, [gameState]);
 
   return (
     <div className="space-y-4">
@@ -313,9 +491,10 @@ function Game3D() {
         </div>
         
         <div className="text-xs text-muted-foreground space-y-1">
-          <p>🚗 Controls: WASD or Arrow Keys</p>
-          <p>🚀 Spacebar: Boost • 🏁 Reach the gold finish line!</p>
-          <p>⚠️ Avoid brown obstacles and walls</p>
+          <p>🚗 3D Controls: WASD or Arrow Keys to drive</p>
+          <p>🚀 Spacebar: Jump • 🏁 Reach the gold finish line!</p>
+          <p>⚠️ Avoid 3D obstacles • 🌍 Full 3D physics with gravity</p>
+          <p>📷 Dynamic 3D camera follows your car</p>
         </div>
       </div>
     </div>
