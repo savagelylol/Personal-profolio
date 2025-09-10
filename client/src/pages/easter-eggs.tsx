@@ -11,8 +11,7 @@ export default function EasterEggs() {
   const [foundEggs, setFoundEggs] = useState<string[]>([]);
   const [showAllHints, setShowAllHints] = useState(false);
 
-  const totalEggs = 7;
-  const easterEggList = [
+  const level1Eggs = [
     { 
       id: 'easterEgg1', 
       name: 'Menu Explorer', 
@@ -78,13 +77,82 @@ export default function EasterEggs() {
     }
   ];
 
+  const level2Eggs = [
+    {
+      id: 'easterEgg2_1',
+      name: 'Social Sleuth',
+      hint: 'Find the hidden social media secret',
+      fullHint: 'Hold Shift and click on the Twitter/X link in the navigation',
+      page: 'Navigation',
+      difficulty: 'Medium',
+      emoji: '🔍'
+    },
+    {
+      id: 'easterEgg2_2',
+      name: 'Code Whisperer',
+      hint: 'Type a secret message in the playground',
+      fullHint: 'In the playground code editor, type exactly: "turflix and expois are awesome"',
+      page: 'Playground',
+      difficulty: 'Hard',
+      emoji: '💻'
+    },
+    {
+      id: 'easterEgg2_3',
+      name: 'Theme Shifter',
+      hint: 'Discover the theme toggle secret',
+      fullHint: 'Click the theme toggle button 5 times rapidly (within 2 seconds)',
+      page: 'Navigation',
+      difficulty: 'Medium',
+      emoji: '🌓'
+    },
+    {
+      id: 'easterEgg2_4',
+      name: 'Project Detective',
+      hint: 'Find the hidden project details',
+      fullHint: 'On the Projects page, hold Alt and click on any GitHub project star count',
+      page: 'Projects',
+      difficulty: 'Hard',
+      emoji: '⭐'
+    },
+    {
+      id: 'easterEgg2_5',
+      name: 'Contact Master',
+      hint: 'Uncover the contact form secret',
+      fullHint: 'In the contact form, type "easter egg hunter" as your name and submit',
+      page: 'Home (Contact)',
+      difficulty: 'Medium',
+      emoji: '📧'
+    },
+    {
+      id: 'easterEgg2_6',
+      name: 'Skill Seeker',
+      hint: 'Find the hidden skill in the skills page',
+      fullHint: 'On Skills page, double-click on the word "Experience" in the page title',
+      page: 'Skills',
+      difficulty: 'Easy',
+      emoji: '🎭'
+    },
+    {
+      id: 'easterEgg2_7',
+      name: 'Ultimate Explorer',
+      hint: 'Complete the final challenge',
+      fullHint: 'On this Easter Eggs page, click on the gift icon 7 times while holding Ctrl',
+      page: 'Easter Eggs',
+      difficulty: 'Expert',
+      emoji: '🏆'
+    }
+  ];
+
   // Live updating effect
   useEffect(() => {
     const updateFoundEggs = () => {
-      const found = easterEggList
+      const foundL1 = level1Eggs
         .map(egg => egg.id)
         .filter(id => localStorage.getItem(id) === 'found');
-      setFoundEggs(found);
+      const foundL2 = level2Eggs
+        .map(egg => egg.id)
+        .filter(id => localStorage.getItem(id) === 'found');
+      setFoundEggs([...foundL1, ...foundL2]);
     };
 
     // Initial load
@@ -102,15 +170,21 @@ export default function EasterEggs() {
     };
   }, []);
 
+  const totalEggs = level1Eggs.length + level2Eggs.length;
+  const level1Complete = level1Eggs.every(egg => foundEggs.includes(egg.id));
+  const level2Unlocked = level1Complete;
+  
   const progress = (foundEggs.length / totalEggs) * 100;
-  const completedEggs = easterEggList.filter(egg => foundEggs.includes(egg.id));
-  const remainingEggs = easterEggList.filter(egg => !foundEggs.includes(egg.id));
+  const allEggs = [...level1Eggs, ...(level2Unlocked ? level2Eggs : [])];
+  const completedEggs = allEggs.filter(egg => foundEggs.includes(egg.id));
+  const remainingEggs = allEggs.filter(egg => !foundEggs.includes(egg.id));
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Easy': return 'text-green-500 bg-green-500/10 border-green-500/20';
       case 'Medium': return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
       case 'Hard': return 'text-red-500 bg-red-500/10 border-red-500/20';
+      case 'Expert': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
       default: return 'text-gray-500 bg-gray-500/10 border-gray-500/20';
     }
   };
@@ -138,7 +212,7 @@ export default function EasterEggs() {
             <Sparkles className="w-10 h-10 text-purple-500" />
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover hidden secrets scattered throughout the website. Each easter egg rewards your curiosity with a fun surprise!
+            Discover hidden secrets scattered throughout the website. Complete Level 1 to unlock Level 2's advanced challenges!
           </p>
         </div>
 
@@ -157,12 +231,33 @@ export default function EasterEggs() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {/* Level Progress */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Level 1:</span>
+                  <Badge variant={level1Complete ? "default" : "secondary"}>
+                    {level1Eggs.filter(egg => foundEggs.includes(egg.id)).length} / {level1Eggs.length}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Level 2:</span>
+                  {level2Unlocked ? (
+                    <Badge variant={level2Eggs.every(egg => foundEggs.includes(egg.id)) ? "default" : "secondary"}>
+                      {level2Eggs.filter(egg => foundEggs.includes(egg.id)).length} / {level2Eggs.length}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">🔒 Locked</Badge>
+                  )}
+                </div>
+              </div>
+              
               <Progress value={progress} className="w-full h-3" />
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  {foundEggs.length === 0 && "Start your hunt!"}
-                  {foundEggs.length > 0 && foundEggs.length < totalEggs && `Keep going! ${totalEggs - foundEggs.length} more to find.`}
-                  {foundEggs.length === totalEggs && "🎉 All easter eggs found! You're amazing!"}
+                  {foundEggs.length === 0 && "Start your Level 1 hunt!"}
+                  {!level1Complete && foundEggs.length > 0 && `${level1Eggs.length - level1Eggs.filter(egg => foundEggs.includes(egg.id)).length} more to unlock Level 2!`}
+                  {level1Complete && !level2Eggs.every(egg => foundEggs.includes(egg.id)) && `Level 2 unlocked! ${level2Eggs.length - level2Eggs.filter(egg => foundEggs.includes(egg.id)).length} more challenges await!`}
+                  {foundEggs.length === totalEggs && "🎉 Master Explorer! All easter eggs found! 🏆"}
                 </span>
                 <span className="text-primary font-medium">{Math.round(progress)}%</span>
               </div>
@@ -180,25 +275,66 @@ export default function EasterEggs() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {completedEggs.map((egg) => (
-                  <div
-                    key={egg.id}
-                    className="flex items-center gap-3 p-3 bg-green-500/5 rounded-lg border border-green-500/20"
-                  >
-                    <div className="text-2xl">{egg.emoji}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-green-600 truncate">{egg.name}</h3>
-                        <Badge className={`text-xs ${getDifficultyColor(egg.difficulty)}`}>
-                          {egg.difficulty}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{egg.page}</p>
+              <div className="space-y-6">
+                {/* Level 1 Completed Eggs */}
+                {level1Eggs.some(egg => foundEggs.includes(egg.id)) && (
+                  <div>
+                    <h3 className="font-semibold text-sm text-green-600 mb-3 flex items-center gap-2">
+                      <span>Level 1</span>
+                      {level1Complete && <span className="text-xs">✅ Complete</span>}
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {level1Eggs.filter(egg => foundEggs.includes(egg.id)).map((egg) => (
+                        <div
+                          key={egg.id}
+                          className="flex items-center gap-3 p-3 bg-green-500/5 rounded-lg border border-green-500/20"
+                        >
+                          <div className="text-2xl">{egg.emoji}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-green-600 truncate">{egg.name}</h3>
+                              <Badge className={`text-xs ${getDifficultyColor(egg.difficulty)}`}>
+                                {egg.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{egg.page}</p>
+                          </div>
+                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        </div>
+                      ))}
                     </div>
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                   </div>
-                ))}
+                )}
+
+                {/* Level 2 Completed Eggs */}
+                {level2Unlocked && level2Eggs.some(egg => foundEggs.includes(egg.id)) && (
+                  <div>
+                    <h3 className="font-semibold text-sm text-yellow-600 mb-3 flex items-center gap-2">
+                      <span>Level 2</span>
+                      {level2Eggs.every(egg => foundEggs.includes(egg.id)) && <span className="text-xs">🏆 Master!</span>}
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {level2Eggs.filter(egg => foundEggs.includes(egg.id)).map((egg) => (
+                        <div
+                          key={egg.id}
+                          className="flex items-center gap-3 p-3 bg-yellow-500/5 rounded-lg border border-yellow-500/20"
+                        >
+                          <div className="text-2xl">{egg.emoji}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-yellow-600 truncate">{egg.name}</h3>
+                              <Badge className={`text-xs ${getDifficultyColor(egg.difficulty)}`}>
+                                {egg.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{egg.page}</p>
+                          </div>
+                          <CheckCircle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -224,28 +360,66 @@ export default function EasterEggs() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {remainingEggs.map((egg) => (
-                  <div
-                    key={egg.id}
-                    className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50"
-                  >
-                    <div className="text-2xl opacity-50">{egg.emoji}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold truncate">{egg.name}</h3>
-                        <Badge className={`text-xs ${getDifficultyColor(egg.difficulty)}`}>
-                          {egg.difficulty}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-1">{egg.page}</p>
-                      <p className="text-xs text-muted-foreground italic">
-                        {showAllHints ? egg.fullHint : egg.hint}
-                      </p>
+              <div className="space-y-6">
+                {/* Level 1 Remaining Eggs */}
+                {level1Eggs.some(egg => !foundEggs.includes(egg.id)) && (
+                  <div>
+                    <h3 className="font-semibold text-sm text-primary mb-3">Level 1</h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {level1Eggs.filter(egg => !foundEggs.includes(egg.id)).map((egg) => (
+                        <div
+                          key={egg.id}
+                          className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50"
+                        >
+                          <div className="text-2xl opacity-50">{egg.emoji}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold truncate">{egg.name}</h3>
+                              <Badge className={`text-xs ${getDifficultyColor(egg.difficulty)}`}>
+                                {egg.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-1">{egg.page}</p>
+                            <p className="text-xs text-muted-foreground italic">
+                              {showAllHints ? egg.fullHint : egg.hint}
+                            </p>
+                          </div>
+                          <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                        </div>
+                      ))}
                     </div>
-                    <Circle className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                   </div>
-                ))}
+                )}
+
+                {/* Level 2 Remaining Eggs */}
+                {level2Unlocked && level2Eggs.some(egg => !foundEggs.includes(egg.id)) && (
+                  <div>
+                    <h3 className="font-semibold text-sm text-yellow-600 mb-3">Level 2 🔓</h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {level2Eggs.filter(egg => !foundEggs.includes(egg.id)).map((egg) => (
+                        <div
+                          key={egg.id}
+                          className="flex items-center gap-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/30"
+                        >
+                          <div className="text-2xl opacity-70">{egg.emoji}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold truncate text-yellow-700 dark:text-yellow-300">{egg.name}</h3>
+                              <Badge className={`text-xs ${getDifficultyColor(egg.difficulty)}`}>
+                                {egg.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-1">{egg.page}</p>
+                            <p className="text-xs text-muted-foreground italic">
+                              {showAllHints ? egg.fullHint : egg.hint}
+                            </p>
+                          </div>
+                          <Circle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -266,6 +440,7 @@ export default function EasterEggs() {
               <p>🔍 Look for interactive elements that seem a bit different or special</p>
               <p>📱 Most easter eggs work on both desktop and mobile devices</p>
               <p>🎯 Don't forget to explore different pages - eggs are hidden everywhere!</p>
+              <p>🏆 Complete Level 1 to unlock Level 2's advanced challenges!</p>
             </div>
           </CardContent>
         </Card>
