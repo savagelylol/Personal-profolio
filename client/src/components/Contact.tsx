@@ -16,12 +16,37 @@ export function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  // Track if we need to check for easter egg on submit
+  const [shouldCheckEasterEgg, setShouldCheckEasterEgg] = useState(false);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Track if the name field contains the easter egg trigger
+    if (field === 'name' && value.toLowerCase() === 'easter egg hunter') {
+      setShouldCheckEasterEgg(true);
+    } else if (field === 'name') {
+      setShouldCheckEasterEgg(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Easter Egg: Contact Master - submit form with "easter egg hunter" as name (Level 2)
+    if (shouldCheckEasterEgg) {
+      const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+      const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+      
+      if (level1Complete && !localStorage.getItem('easterEgg2_5')) {
+        localStorage.setItem('easterEgg2_5', 'found');
+        window.dispatchEvent(new CustomEvent('easterEggFound'));
+        setTimeout(() => {
+          alert('🎉 Level 2 Easter Egg Found! 📧 Contact Master unlocked! You submitted with the secret name - turflix and expois approve!');
+        }, 100);
+      }
+      setShouldCheckEasterEgg(false);
+    }
     
     if (!formData.name || !formData.email || !formData.message) {
       toast({
@@ -68,6 +93,31 @@ export function Contact() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Easter Egg: Social Sleuth - Shift+click Twitter link (Level 2)
+  const handleSocialClick = (link: any, event: React.MouseEvent) => {
+    if (link.label === 'Twitter' && event.shiftKey) {
+      event.preventDefault();
+      
+      // Check if level 1 is complete first
+      const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+      const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+      
+      if (level1Complete && !localStorage.getItem('easterEgg2_1')) {
+        localStorage.setItem('easterEgg2_1', 'found');
+        window.dispatchEvent(new CustomEvent('easterEggFound'));
+        alert('🎉 Level 2 Easter Egg Found! 🔍 Social Sleuth discovered! You found the hidden Twitter secret - turflix and expois would love this!');
+      } else {
+        // Still open the link if easter egg is already found or level 1 not complete
+        window.open(link.href, '_blank');
+      }
+    } else {
+      // Normal link behavior
+      if (link.href !== '#') {
+        window.open(link.href, '_blank');
+      }
     }
   };
 
@@ -160,6 +210,7 @@ export function Contact() {
               <a
                 key={index}
                 href={link.href}
+                onClick={(e) => handleSocialClick(link, e)}
                 className="w-12 h-12 bg-card border border-border rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all hover:scale-110"
                 aria-label={link.label}
                 data-testid={`link-social-${link.label.toLowerCase()}`}

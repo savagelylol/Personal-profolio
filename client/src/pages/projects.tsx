@@ -270,7 +270,26 @@ export default function Projects() {
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                   {project.type === 'github' ? (
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1" data-testid={`stat-stars-${project.name}`}>
+                      <div 
+                        className="flex items-center space-x-1" 
+                        data-testid={`stat-stars-${project.name}`}
+                        onClick={(e) => {
+                          // Easter Egg: Project Detective - Alt+click star count (Level 2)
+                          if (e.altKey) {
+                            e.preventDefault();
+                            // Check if level 1 is complete first
+                            const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+                            const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+                            
+                            if (level1Complete && !localStorage.getItem('easterEgg2_4')) {
+                              localStorage.setItem('easterEgg2_4', 'found');
+                              window.dispatchEvent(new CustomEvent('easterEggFound'));
+                              alert('🎉 Level 2 Easter Egg Found! ⭐ Project Detective mastered! You discovered the hidden project details - turflix and expois are impressed!');
+                            }
+                          }
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <Star className="h-4 w-4" />
                         <span>{project.stargazers_count}</span>
                       </div>

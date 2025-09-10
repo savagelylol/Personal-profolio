@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTheme } from './ThemeProvider';
 import { Moon, Sun, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,33 @@ import { SideMenu } from './SideMenu';
 export function Navigation() {
   const { theme, toggleTheme } = useTheme();
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  
+  // Easter Egg: Theme Shifter - Rapid clicking (Level 2)
+  const clickTimesRef = useRef<number[]>([]);
+  
+  const handleThemeToggle = () => {
+    const now = Date.now();
+    clickTimesRef.current.push(now);
+    
+    // Keep only clicks from the last 2 seconds
+    clickTimesRef.current = clickTimesRef.current.filter(time => now - time <= 2000);
+    
+    // Check if clicked 5 times rapidly (within 2 seconds) - Easter egg trigger
+    if (clickTimesRef.current.length >= 5) {
+      // Check if level 1 is complete first
+      const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+      const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+      
+      if (level1Complete && !localStorage.getItem('easterEgg2_3')) {
+        localStorage.setItem('easterEgg2_3', 'found');
+        window.dispatchEvent(new CustomEvent('easterEggFound'));
+        alert('🎉 Level 2 Easter Egg Found! 🌓 Theme Shifter mastered! You rapidly clicked the theme toggle - turflix and expois love the dedication!');
+      }
+      clickTimesRef.current = []; // Reset
+    }
+    
+    toggleTheme();
+  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -20,7 +47,7 @@ export function Navigation() {
     <>
       {/* Theme Toggle */}
       <Button
-        onClick={toggleTheme}
+        onClick={handleThemeToggle}
         className="fixed top-4 right-6 z-[60] bg-card border border-border rounded-full p-3 hover:bg-secondary hover:scale-110"
         size="icon"
         variant="ghost"

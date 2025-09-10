@@ -19,42 +19,6 @@ interface SideMenuProps {
 
 export function SideMenu({ isOpen, onClose }: SideMenuProps) {
   const [easterEggFound, setEasterEggFound] = useState(false);
-  
-  // Easter egg: konami code detector
-  useEffect(() => {
-    const konamiCode = [
-      'ArrowUp', 'ArrowUp', 
-      'ArrowDown', 'ArrowDown',
-      'ArrowLeft', 'ArrowRight', 
-      'ArrowLeft', 'ArrowRight',
-      'KeyB', 'KeyA'
-    ];
-    let konamiIndex = 0;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === konamiCode[konamiIndex]) {
-        konamiIndex++;
-        if (konamiIndex === konamiCode.length) {
-          setEasterEggFound(true);
-          if (!localStorage.getItem('easterEgg2')) {
-            localStorage.setItem('easterEgg2', 'found');
-            window.dispatchEvent(new CustomEvent('easterEggFound'));
-          }
-          konamiIndex = 0;
-        }
-      } else {
-        konamiIndex = 0;
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen]);
 
   const menuItems = [
     { 

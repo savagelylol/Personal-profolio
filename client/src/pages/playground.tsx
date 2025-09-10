@@ -512,6 +512,26 @@ export default function Playground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [animationId, setAnimationId] = useState<number>();
 
+  // Easter Egg: Code Whisperer - typing secret message (Level 2)
+  const handleCodeChange = (value: string) => {
+    setCode(value);
+    
+    // Check if code contains the secret message
+    if (value.includes('turflix and expois are awesome')) {
+      // Check if level 1 is complete first
+      const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+      const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+      
+      if (level1Complete && !localStorage.getItem('easterEgg2_2')) {
+        localStorage.setItem('easterEgg2_2', 'found');
+        window.dispatchEvent(new CustomEvent('easterEggFound'));
+        setTimeout(() => {
+          alert('🎉 Level 2 Easter Egg Found! 💻 Code Whisperer mastered! You typed the secret message - turflix and expois are indeed awesome!');
+        }, 100);
+      }
+    }
+  };
+
   const languages = [
     { id: 'javascript', name: 'JavaScript', color: 'bg-yellow-500' },
     { id: 'python', name: 'Python', color: 'bg-green-500' },
@@ -1004,7 +1024,7 @@ console.log('✨ Click the canvas to create particles!');`,
                 <CardContent>
                   <textarea
                     value={code}
-                    onChange={(e) => setCode(e.target.value)}
+                    onChange={(e) => handleCodeChange(e.target.value)}
                     className="w-full h-64 p-4 bg-secondary border border-border rounded font-mono text-sm resize-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     placeholder="Start coding..."
                     data-testid="textarea-code-editor"

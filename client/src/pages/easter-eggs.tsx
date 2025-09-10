@@ -82,8 +82,8 @@ export default function EasterEggs() {
       id: 'easterEgg2_1',
       name: 'Social Sleuth',
       hint: 'Find the hidden social media secret',
-      fullHint: 'Hold Shift and click on the Twitter/X link in the navigation',
-      page: 'Navigation',
+      fullHint: 'Hold Shift and click on the Twitter/X link in the contact section',
+      page: 'Home (Contact)',
       difficulty: 'Medium',
       emoji: '🔍'
     },
@@ -205,7 +205,31 @@ export default function EasterEggs() {
         {/* Page Title */}
         <div className="text-center mb-12">
           <div className="flex justify-center items-center gap-3 mb-4">
-            <Gift className="w-10 h-10 text-primary" />
+            <Gift 
+              className="w-10 h-10 text-primary" 
+              onClick={(e) => {
+                // Easter Egg: Ultimate Explorer - Ctrl+click gift icon 7 times (Level 2)
+                if (e.ctrlKey || e.metaKey) {
+                  const clickCount = parseInt(localStorage.getItem('ultimateExplorerClicks') || '0') + 1;
+                  localStorage.setItem('ultimateExplorerClicks', clickCount.toString());
+                  
+                  if (clickCount >= 7) {
+                    // Check if level 1 is complete first
+                    const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+                    const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+                    
+                    if (level1Complete && !localStorage.getItem('easterEgg2_7')) {
+                      localStorage.setItem('easterEgg2_7', 'found');
+                      window.dispatchEvent(new CustomEvent('easterEggFound'));
+                      localStorage.removeItem('ultimateExplorerClicks'); // Reset counter
+                      alert('🎉 Level 2 Easter Egg Found! 🏆 Ultimate Explorer achieved! You completed the final challenge! You are now the Master Explorer - turflix and expois salute you!');
+                    }
+                  }
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+              data-testid="icon-gift-ultimate"
+            />
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
               Easter Egg Hunt
             </h1>

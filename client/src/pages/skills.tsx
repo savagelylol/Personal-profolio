@@ -134,7 +134,23 @@ export default function Skills() {
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-              Skills & Expertise
+              Skills & <span 
+                onDoubleClick={() => {
+                  // Easter Egg: Skill Seeker - double-click "Experience" (Level 2)
+                  const level1Eggs = ['easterEgg1', 'easterEgg2', 'easterEgg3', 'easterEgg4', 'easterEgg5', 'easterEgg6', 'easterEgg7'];
+                  const level1Complete = level1Eggs.every(id => localStorage.getItem(id) === 'found');
+                  
+                  if (level1Complete && !localStorage.getItem('easterEgg2_6')) {
+                    localStorage.setItem('easterEgg2_6', 'found');
+                    window.dispatchEvent(new CustomEvent('easterEggFound'));
+                    alert('🎉 Level 2 Easter Egg Found! 🎭 Skill Seeker discovered! You found the hidden skill - turflix and expois would be proud!');
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+                data-testid="text-experience-title"
+              >
+                Experience
+              </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Technologies I love working with and the experience I've gained over the years

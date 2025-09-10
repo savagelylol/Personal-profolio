@@ -12,6 +12,7 @@ import Skills from "@/pages/skills";
 import Timeline from "@/pages/timeline";
 import EasterEggs from "@/pages/easter-eggs";
 import NotFound from "@/pages/not-found";
+import { useEffect } from "react";
 
 function Router() {
   return (
@@ -29,6 +30,40 @@ function Router() {
 }
 
 function App() {
+  // Global Konami code easter egg (Level 1)
+  useEffect(() => {
+    const konamiCode = [
+      'ArrowUp', 'ArrowUp', 
+      'ArrowDown', 'ArrowDown',
+      'ArrowLeft', 'ArrowRight', 
+      'ArrowLeft', 'ArrowRight',
+      'KeyB', 'KeyA'
+    ];
+    let konamiIndex = 0;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          if (!localStorage.getItem('easterEgg2')) {
+            localStorage.setItem('easterEgg2', 'found');
+            window.dispatchEvent(new CustomEvent('easterEggFound'));
+            alert('🎉 Easter Egg #2 Found! 🎮 Konami Master! You entered the legendary cheat code!');
+          }
+          konamiIndex = 0;
+        }
+      } else {
+        konamiIndex = 0;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
