@@ -31,7 +31,11 @@
     }
   ],
   "functions": {
+<<<<<<< HEAD
     "api/index.ts": {
+=======
+    "server/index.ts": {
+>>>>>>> 7734ba2 (Update Vercel configuration to resolve build conflicts)
       "maxDuration": 60
     }
   }
