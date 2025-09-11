@@ -112,7 +112,7 @@ export default function Settings() {
         },
         {
           id: "night-mode",
-          title: "Night Time Mode",
+          title: "Nite Time",
           description: "Deep midnight purple theme perfect for late-night browsing",
           icon: Moon,
           value: nightMode,
