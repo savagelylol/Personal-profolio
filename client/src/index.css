@@ -315,6 +315,7 @@
 .night-mode {
   --radius: 0.75rem;
   --primary: hsl(260, 100%, 70%);
+  --primary-foreground: hsl(260, 25%, 8%);
   --accent: hsl(280, 85%, 65%);
   --background: hsl(260, 25%, 8%);
   --card: hsl(260, 20%, 12%);
@@ -377,12 +378,18 @@
 }
 
 /* Button text visibility */
-.night-mode button {
+.night-mode .bg-primary,
+.night-mode .bg-primary span {
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.night-mode button:not(.bg-primary) {
   color: hsl(var(--foreground));
 }
 
-.night-mode button[class*="primary"] {
-  color: hsl(var(--background));
+.night-mode .text-primary-foreground,
+.night-mode .text-primary-foreground span {
+  color: hsl(var(--primary-foreground)) !important;
 }
 
 /* Specific text elements that need visibility */
