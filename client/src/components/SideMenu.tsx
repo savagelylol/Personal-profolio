@@ -8,7 +8,8 @@ import {
   Clock, 
   Sparkles,
   Coffee,
-  Gamepad2
+  Gamepad2,
+  Settings
 } from 'lucide-react';
 
 interface SideMenuProps {
@@ -37,6 +38,12 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
       label: 'My Journey', 
       href: '/timeline',
       description: 'Development timeline'
+    },
+    { 
+      icon: Settings, 
+      label: 'Settings', 
+      href: '/settings',
+      description: 'Customize your experience'
     },
     { 
       icon: Sparkles, 
