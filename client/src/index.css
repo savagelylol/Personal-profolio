@@ -321,8 +321,8 @@
   --secondary: hsl(260, 15%, 16%);
   --border: hsl(260, 15%, 20%);
   --muted: hsl(260, 15%, 18%);
-  --foreground: hsl(260, 15%, 92%);
-  --muted-foreground: hsl(260, 10%, 75%);
+  --foreground: hsl(260, 10%, 95%);
+  --muted-foreground: hsl(260, 15%, 80%);
 }
 
 .night-mode .bg-card,
@@ -363,6 +363,37 @@
     hsl(280, 100%, 60% / 0.06), 
     hsl(300, 100%, 60% / 0.05)
   );
+}
+
+/* Night mode text visibility fixes */
+.night-mode {
+  color: hsl(var(--foreground));
+}
+
+.night-mode p,
+.night-mode span,
+.night-mode div,
+.night-mode label,
+.night-mode .text-sm,
+.night-mode .text-base,
+.night-mode .text-lg {
+  color: hsl(var(--foreground));
+}
+
+.night-mode .text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.night-mode h4,
+.night-mode h5,
+.night-mode h6 {
+  color: hsl(var(--foreground));
+}
+
+.night-mode .card p,
+.night-mode .card span,
+.night-mode .card div {
+  color: hsl(var(--foreground));
 }
 
 /* Icon color adjustments for themes */
