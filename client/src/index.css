@@ -382,6 +382,10 @@ html.night-mode button,
 html.night-mode button span,
 html.night-mode .bg-primary,
 html.night-mode .bg-primary span,
+html.night-mode .bg-primary.text-primary-foreground,
+html.night-mode .bg-primary.text-primary-foreground span,
+html.night-mode button.bg-primary.text-primary-foreground,
+html.night-mode button.bg-primary.text-primary-foreground span,
 html.night-mode [class*="bg-primary"] span {
   color: white !important;
 }
