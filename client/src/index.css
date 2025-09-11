@@ -79,7 +79,7 @@
 
 @layer base {
   * {
-    @apply border-border transition-all duration-300;
+    @apply border-border transition-colors duration-200;
   }
 
   body {
@@ -213,24 +213,25 @@
   --muted: hsl(25, 15%, 22%);
 }
 
-.comfort-mode * {
-  @apply rounded-xl;
+.comfort-mode :where(button, .btn, input, textarea, select, .badge, .card) {
+  border-radius: var(--radius);
 }
 
-.comfort-mode .card,
-.comfort-mode [class*="card"] {
+.comfort-mode .bg-card,
+.comfort-mode .card {
   background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
-              0 0 20px hsl(var(--primary) / 0.1);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 
+              0 0 10px hsl(var(--primary) / 0.1);
 }
 
 .comfort-mode button {
-  @apply rounded-full transition-all duration-300;
+  border-radius: 9999px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .comfort-mode button:hover {
-  @apply scale-105;
+  transform: scale(1.05);
   box-shadow: 0 4px 20px hsl(var(--primary) / 0.3);
 }
 
@@ -324,22 +325,22 @@
   --muted-foreground: hsl(260, 10%, 75%);
 }
 
-.night-mode .card,
-.night-mode [class*="card"] {
+.night-mode .bg-card,
+.night-mode .card {
   background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
-              0 0 25px hsl(var(--primary) / 0.15);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 
+              0 0 12px hsl(var(--primary) / 0.15);
   border: 1px solid hsl(var(--primary) / 0.2);
 }
 
 .night-mode button {
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .night-mode button:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 25px hsl(var(--primary) / 0.4);
+  box-shadow: 0 4px 20px hsl(var(--primary) / 0.4);
 }
 
 .night-mode .enhanced-glow {
