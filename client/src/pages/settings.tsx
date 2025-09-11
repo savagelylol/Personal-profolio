@@ -24,6 +24,7 @@ import { EasterEggTracker } from '@/components/EasterEggTracker';
 export default function Settings() {
   // Settings state
   const [comfortMode, setComfortMode] = useState(false);
+  const [nightMode, setNightMode] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [soundEffects, setSoundEffects] = useState(true);
@@ -36,6 +37,7 @@ export default function Settings() {
     if (savedSettings) {
       const settings = JSON.parse(savedSettings);
       setComfortMode(settings.comfortMode || false);
+      setNightMode(settings.nightMode || false);
       setReducedMotion(settings.reducedMotion || false);
       setDarkMode(settings.darkMode || false);
       setSoundEffects(settings.soundEffects !== undefined ? settings.soundEffects : true);
@@ -48,6 +50,7 @@ export default function Settings() {
   useEffect(() => {
     const settings = {
       comfortMode,
+      nightMode,
       reducedMotion,
       darkMode,
       soundEffects,
@@ -61,6 +64,13 @@ export default function Settings() {
       document.body.classList.add('comfort-mode');
     } else {
       document.body.classList.remove('comfort-mode');
+    }
+
+    // Apply night mode class to body
+    if (nightMode) {
+      document.body.classList.add('night-mode');
+    } else {
+      document.body.classList.remove('night-mode');
     }
 
     // Apply reduced motion preference
@@ -79,7 +89,7 @@ export default function Settings() {
 
     // Dispatch event for other components to react to settings changes
     window.dispatchEvent(new CustomEvent('settingsChanged', { detail: settings }));
-  }, [comfortMode, reducedMotion, darkMode, soundEffects, autoSave, compactMode]);
+  }, [comfortMode, nightMode, reducedMotion, darkMode, soundEffects, autoSave, compactMode]);
 
   const settingSections = [
     {
@@ -94,6 +104,15 @@ export default function Settings() {
           value: comfortMode,
           onChange: setComfortMode,
           badge: "Popular"
+        },
+        {
+          id: "night-mode",
+          title: "Night Time Mode",
+          description: "Deep midnight purple theme perfect for late-night browsing",
+          icon: Moon,
+          value: nightMode,
+          onChange: setNightMode,
+          badge: "New"
         },
         {
           id: "compact-mode", 

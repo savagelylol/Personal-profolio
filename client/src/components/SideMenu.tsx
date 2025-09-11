@@ -80,7 +80,7 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
 
       {/* Side Menu */}
       <div 
-        className={`fixed top-0 left-0 h-full w-96 bg-card/95 backdrop-blur-md border-r border-border shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 left-0 h-full w-96 bg-card/95 backdrop-blur-md border-r border-border shadow-2xl z-50 transform transition-transform duration-300 ease-out overflow-hidden flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -114,7 +114,7 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
         )}
 
         {/* Menu Items */}
-        <nav className="p-8 space-y-3">
+        <nav className="p-8 space-y-3 overflow-y-auto flex-1">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (

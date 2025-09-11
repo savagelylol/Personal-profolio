@@ -309,3 +309,82 @@
 .compact-mode .space-y-3 > * + * {
   margin-top: 0.5rem !important;
 }
+
+/* Night Mode Styles */
+.night-mode {
+  --radius: 0.75rem;
+  --primary: hsl(260, 100%, 70%);
+  --accent: hsl(280, 85%, 65%);
+  --background: hsl(260, 25%, 8%);
+  --card: hsl(260, 20%, 12%);
+  --secondary: hsl(260, 15%, 16%);
+  --border: hsl(260, 15%, 20%);
+  --muted: hsl(260, 15%, 18%);
+  --foreground: hsl(260, 15%, 92%);
+  --muted-foreground: hsl(260, 10%, 75%);
+}
+
+.night-mode .card,
+.night-mode [class*="card"] {
+  background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
+              0 0 25px hsl(var(--primary) / 0.15);
+  border: 1px solid hsl(var(--primary) / 0.2);
+}
+
+.night-mode button {
+  transition: all 0.3s ease;
+}
+
+.night-mode button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 25px hsl(var(--primary) / 0.4);
+}
+
+.night-mode .enhanced-glow {
+  box-shadow: 
+    0 0 35px hsl(var(--primary) / 0.5),
+    0 0 70px hsl(var(--primary) / 0.4),
+    0 0 105px hsl(var(--primary) / 0.3);
+}
+
+.night-mode h1, 
+.night-mode h2, 
+.night-mode h3 {
+  color: hsl(var(--primary));
+  text-shadow: 0 0 15px hsl(var(--primary) / 0.4);
+}
+
+.night-mode .bg-gradient-to-br {
+  background: linear-gradient(135deg, 
+    hsl(var(--primary) / 0.08), 
+    hsl(280, 100%, 60% / 0.06), 
+    hsl(300, 100%, 60% / 0.05)
+  );
+}
+
+/* Icon color adjustments for themes */
+.comfort-mode [class*="text-primary"] {
+  color: hsl(28, 100%, 65%) !important;
+}
+
+.night-mode [class*="text-primary"] {
+  color: hsl(260, 100%, 70%) !important;
+}
+
+.comfort-mode [class*="bg-primary/10"] {
+  background-color: hsl(28, 100%, 65% / 0.1) !important;
+}
+
+.night-mode [class*="bg-primary/10"] {
+  background-color: hsl(260, 100%, 70% / 0.1) !important;
+}
+
+.comfort-mode [class*="bg-primary/20"]:hover {
+  background-color: hsl(28, 100%, 65% / 0.2) !important;
+}
+
+.night-mode [class*="bg-primary/20"]:hover {
+  background-color: hsl(260, 100%, 70% / 0.2) !important;
+}

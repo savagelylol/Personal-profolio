@@ -46,6 +46,11 @@ function App() {
           document.body.classList.add('comfort-mode');
         }
         
+        // Apply night mode
+        if (settings.nightMode) {
+          document.body.classList.add('night-mode');
+        }
+        
         // Apply reduced motion
         if (settings.reducedMotion) {
           document.body.classList.add('reduce-motion');
@@ -69,6 +74,13 @@ function App() {
         document.body.classList.add('comfort-mode');
       } else {
         document.body.classList.remove('comfort-mode');
+      }
+      
+      // Apply night mode
+      if (settings.nightMode) {
+        document.body.classList.add('night-mode');
+      } else {
+        document.body.classList.remove('night-mode');
       }
       
       // Apply reduced motion
