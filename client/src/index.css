@@ -328,9 +328,12 @@
 
 .night-mode .bg-card,
 .night-mode .card {
-  background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));
+  background: linear-gradient(135deg, 
+    hsl(var(--card) / 0.9), 
+    hsl(var(--card) / 0.7),
+    rgba(0, 0, 0, 0.2));
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 
               0 0 12px hsl(var(--primary) / 0.15);
   border: 1px solid hsl(var(--primary) / 0.2);
 }
@@ -377,31 +380,26 @@
   color: hsl(var(--foreground));
 }
 
-/* Button text visibility - all buttons white text */
-html.night-mode button,
-html.night-mode button span,
-html.night-mode .bg-primary,
-html.night-mode .bg-primary span,
-html.night-mode .bg-primary.text-primary-foreground,
-html.night-mode .bg-primary.text-primary-foreground span,
-html.night-mode button.bg-primary.text-primary-foreground,
-html.night-mode button.bg-primary.text-primary-foreground span,
-html.night-mode [class*="bg-primary"] span {
+/* Force all button text to be white in night mode */
+.night-mode button * {
   color: white !important;
 }
 
-/* General text visibility fixes */
-html.night-mode span,
-html.night-mode p,
-html.night-mode div:not(.bg-primary) {
-  color: hsl(260, 10%, 95%);
+.night-mode button {
+  color: white !important;
 }
 
-/* Skills and card content visibility */
-html.night-mode .card span,
-html.night-mode .card p,
-html.night-mode [class*="skill"] span {
-  color: hsl(260, 10%, 95%) !important;
+/* Semi-transparent elements with dark tint */
+.night-mode [class*="/"] {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.night-mode .bg-card\/50,
+.night-mode .bg-card\/30 {
+  background: linear-gradient(135deg, 
+    hsl(var(--card) / 0.5), 
+    hsl(var(--card) / 0.3),
+    rgba(0, 0, 0, 0.3)) !important;
 }
 
 /* Icon color adjustments for themes */
