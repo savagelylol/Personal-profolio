@@ -102,7 +102,12 @@ export default function Settings() {
           description: "Softer colors, rounded corners, and cozy spacing for a relaxing experience",
           icon: Coffee,
           value: comfortMode,
-          onChange: setComfortMode,
+          onChange: (value: boolean) => {
+            setComfortMode(value);
+            if (value && nightMode) {
+              setNightMode(false);
+            }
+          },
           badge: "Popular"
         },
         {
@@ -111,7 +116,12 @@ export default function Settings() {
           description: "Deep midnight purple theme perfect for late-night browsing",
           icon: Moon,
           value: nightMode,
-          onChange: setNightMode,
+          onChange: (value: boolean) => {
+            setNightMode(value);
+            if (value && comfortMode) {
+              setComfortMode(false);
+            }
+          },
           badge: "New"
         },
         {
