@@ -377,21 +377,13 @@
   color: hsl(var(--foreground));
 }
 
-/* Button text visibility - high specificity */
+/* Button text visibility - all buttons white text */
+html.night-mode button,
+html.night-mode button span,
 html.night-mode .bg-primary,
 html.night-mode .bg-primary span,
-html.night-mode button.bg-primary span,
 html.night-mode [class*="bg-primary"] span {
-  color: hsl(260, 25%, 8%) !important;
-}
-
-html.night-mode .text-primary-foreground,
-html.night-mode .text-primary-foreground span {
-  color: hsl(260, 25%, 8%) !important;
-}
-
-html.night-mode button:not(.bg-primary) {
-  color: hsl(260, 10%, 95%) !important;
+  color: white !important;
 }
 
 /* General text visibility fixes */
