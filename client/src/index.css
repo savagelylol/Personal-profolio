@@ -377,24 +377,35 @@
   color: hsl(var(--foreground));
 }
 
-/* Button text visibility */
-.night-mode .bg-primary,
-.night-mode .bg-primary span {
-  color: hsl(var(--primary-foreground)) !important;
+/* Button text visibility - high specificity */
+html.night-mode .bg-primary,
+html.night-mode .bg-primary span,
+html.night-mode button.bg-primary span,
+html.night-mode [class*="bg-primary"] span {
+  color: hsl(260, 25%, 8%) !important;
 }
 
-.night-mode button:not(.bg-primary) {
-  color: hsl(var(--foreground));
+html.night-mode .text-primary-foreground,
+html.night-mode .text-primary-foreground span {
+  color: hsl(260, 25%, 8%) !important;
 }
 
-.night-mode .text-primary-foreground,
-.night-mode .text-primary-foreground span {
-  color: hsl(var(--primary-foreground)) !important;
+html.night-mode button:not(.bg-primary) {
+  color: hsl(260, 10%, 95%) !important;
 }
 
-/* Specific text elements that need visibility */
-.night-mode .text-foreground {
-  color: hsl(var(--foreground)) !important;
+/* General text visibility fixes */
+html.night-mode span,
+html.night-mode p,
+html.night-mode div:not(.bg-primary) {
+  color: hsl(260, 10%, 95%);
+}
+
+/* Skills and card content visibility */
+html.night-mode .card span,
+html.night-mode .card p,
+html.night-mode [class*="skill"] span {
+  color: hsl(260, 10%, 95%) !important;
 }
 
 /* Icon color adjustments for themes */
