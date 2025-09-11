@@ -7,7 +7,6 @@ import {
   Star, 
   Clock, 
   Sparkles,
-  Heart,
   Coffee,
   Gamepad2
 } from 'lucide-react';
@@ -149,18 +148,6 @@ export function SideMenu({ isOpen, onClose }: SideMenuProps) {
           })}
         </nav>
 
-        {/* Fun Footer Message */}
-        <div className="absolute bottom-8 left-8 right-8">
-          <div className="p-5 bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-xl border border-primary/20">
-            <div className="flex items-center gap-3 mb-3">
-              <Heart className="w-5 h-5 text-red-500" />
-              <span className="text-base font-semibold">Built with ❤️</span>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Thanks to turflix and expois for the inspiration! 🚀
-            </p>
-          </div>
-        </div>
       </div>
     </>
   );
