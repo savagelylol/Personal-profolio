@@ -2,41 +2,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/server/index.ts"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods", 
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    }
-  ],
-  "functions": {
-<<<<<<< HEAD
-    "api/index.ts": {
-=======
-    "server/index.ts": {
->>>>>>> 7734ba2 (Update Vercel configuration to resolve build conflicts)
-      "maxDuration": 60
-    }
-  }
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
